@@ -14,7 +14,8 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signInWithPopup, 
-  GoogleAuthProvider 
+  GoogleAuthProvider,
+  firebaseSignOut
 } from '../../lib/firebase';
 
 interface AdminLoginModalProps {
@@ -23,13 +24,15 @@ interface AdminLoginModalProps {
   onLoginSuccess: () => void;
 }
 
+const ALLOWED_ADMIN_EMAILS = ['demmizkenya@gmail.com', 'danielowino233@gmail.com'];
+
 export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   isOpen,
   onClose,
   onLoginSuccess,
 }) => {
-  const [email, setEmail] = useState('danielowino233@gmail.com');
-  const [password, setPassword] = useState('DanielOwino2026!');
+  const [email, setEmail] = useState('demmizkenya@gmail.com');
+  const [password, setPassword] = useState('G57SHN49g#Daniel');
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,28 +46,65 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     setError(null);
     setSuccess(null);
 
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Enforce strict admin authorization check
+    if (!ALLOWED_ADMIN_EMAILS.includes(cleanEmail)) {
+      setError('Access Denied: Only authorized administrator email addresses can log into the admin portal.');
+      setLoading(false);
+      return;
+    }
+
     try {
+      let userCredential;
       if (isRegisterMode) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
         setSuccess('Admin account created successfully! Logging you in...');
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        setSuccess('Authenticated as Admin!');
+        try {
+          userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
+          setSuccess('Authenticated as Admin!');
+        } catch (signInErr: any) {
+          // If account doesn't exist yet, automatically provision it for the designated admin
+          if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
+            try {
+              userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
+              setSuccess('Admin account initialized and logged in successfully!');
+            } catch (createErr: any) {
+              if (createErr.code === 'auth/email-already-in-use') {
+                throw signInErr; // Actual wrong password
+              } else {
+                throw createErr;
+              }
+            }
+          } else {
+            throw signInErr;
+          }
+        }
+      }
+
+      // Final double check on authenticated user
+      const user = userCredential?.user || auth.currentUser;
+      if (user && !ALLOWED_ADMIN_EMAILS.includes(user.email?.toLowerCase() || '')) {
+        await firebaseSignOut(auth);
+        setError('Access Denied: Account is not an authorized administrator.');
+        setLoading(false);
+        return;
       }
 
       setTimeout(() => {
         onLoginSuccess();
         onClose();
-      }, 800);
+      }, 600);
     } catch (err: any) {
       console.error('Auth error:', err);
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-        setError('Account not found or password incorrect. Try registering this email or check credentials.');
+      if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setError('Incorrect password for admin account. Please check your credentials.');
       } else if (err.code === 'auth/email-already-in-use') {
-        setError('This admin email already exists. Switching to Sign In...');
+        setError('Admin email already exists. Switch to Sign In mode.');
         setIsRegisterMode(false);
       } else {
-        setError(err.message || 'Authentication failed.');
+        setError(err.message || 'Authentication failed. Please check credentials.');
       }
     } finally {
       setLoading(false);
@@ -76,12 +116,21 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     setError(null);
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      if (user && !ALLOWED_ADMIN_EMAILS.includes(user.email?.toLowerCase() || '')) {
+        await firebaseSignOut(auth);
+        setError(`Access Denied: ${user.email} is not authorized for Admin Panel access.`);
+        setLoading(false);
+        return;
+      }
+
       setSuccess('Google Authentication Successful!');
       setTimeout(() => {
         onLoginSuccess();
         onClose();
-      }, 800);
+      }, 600);
     } catch (err: any) {
       setError(err.message || 'Google Auth failed.');
     } finally {
@@ -103,27 +152,27 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mx-auto font-bold shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto font-bold shadow-xs">
             <Lock className="w-6 h-6" />
           </div>
-          <h3 className="text-2xl font-extrabold text-slate-900">
-            {isRegisterMode ? 'Create Admin Credentials' : 'Admin Portal Login'}
+          <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            {isRegisterMode ? 'Register Admin Account' : 'Admin Portal Login'}
           </h3>
-          <p className="text-xs text-slate-500">
-            Secure CMS access for portfolio management (Daniel Owino)
+          <p className="text-xs text-slate-500 font-medium">
+            Strictly restricted to Daniel Owino (demmizkenya@gmail.com)
           </p>
         </div>
 
         {/* Feedback messages */}
         {error && (
-          <div className="p-3.5 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2">
+          <div className="p-3.5 bg-red-50 border border-red-200 text-red-900 rounded-2xl text-xs flex items-center gap-2 font-medium">
             <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2">
+          <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl text-xs flex items-center gap-2 font-medium">
             <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
             <span>{success}</span>
           </div>
@@ -132,7 +181,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         {/* Form */}
         <form onSubmit={handleEmailAuth} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-slate-400" /> Admin Email
             </label>
             <input
@@ -140,13 +189,13 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500"
-              placeholder="danielowino233@gmail.com"
+              className="w-full px-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 font-medium"
+              placeholder="demmizkenya@gmail.com"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
               <Key className="w-3.5 h-3.5 text-slate-400" /> Password
             </label>
             <input
@@ -154,7 +203,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 font-medium"
               placeholder="••••••••••••"
             />
           </div>
@@ -162,10 +211,10 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-md shadow-blue-600/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-full shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>{loading ? 'Authenticating...' : (isRegisterMode ? 'Register & Access Admin' : 'Sign In to Dashboard')}</span>
+            <span>{loading ? 'Authenticating...' : (isRegisterMode ? 'Register Admin Account' : 'Sign In to Dashboard')}</span>
           </button>
         </form>
 
@@ -179,9 +228,9 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           onClick={handleGoogleAuth}
           disabled={loading}
           type="button"
-          className="w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold text-xs rounded-xl shadow-2xs transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold text-xs rounded-full shadow-2xs transition-colors flex items-center justify-center gap-2"
         >
-          <UserCheck className="w-4 h-4 text-blue-600" />
+          <UserCheck className="w-4 h-4 text-indigo-600" />
           <span>Sign In with Google</span>
         </button>
 
@@ -190,9 +239,9 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           <button
             type="button"
             onClick={() => { setIsRegisterMode(!isRegisterMode); setError(null); }}
-            className="text-xs text-blue-600 font-semibold hover:underline"
+            className="text-xs text-indigo-600 font-bold hover:underline"
           >
-            {isRegisterMode ? 'Already registered? Sign In instead' : 'First time setup? Register initial Admin account'}
+            {isRegisterMode ? 'Already registered? Sign In instead' : 'First time setup? Register Admin account'}
           </button>
         </div>
 
@@ -200,3 +249,4 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     </div>
   );
 };
+

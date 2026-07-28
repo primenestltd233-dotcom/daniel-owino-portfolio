@@ -101,8 +101,20 @@ export default function App() {
   useEffect(() => {
     ensureInitialSeed();
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      setAdminUser(user);
+    const ALLOWED_ADMIN_EMAILS = ['demmizkenya@gmail.com', 'danielowino233@gmail.com'];
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+      if (user && user.email) {
+        const cleanEmail = user.email.toLowerCase();
+        if (ALLOWED_ADMIN_EMAILS.includes(cleanEmail)) {
+          setAdminUser(user);
+        } else {
+          await firebaseSignOut(auth);
+          setAdminUser(null);
+        }
+      } else {
+        setAdminUser(null);
+      }
     });
 
     return () => unsubscribeAuth();
