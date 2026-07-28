@@ -7,7 +7,11 @@ import {
   CheckCircle2, 
   AlertCircle,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  Eye,
+  EyeOff,
+  UserCog,
+  RefreshCw
 } from 'lucide-react';
 import { 
   auth, 
@@ -15,7 +19,8 @@ import {
   createUserWithEmailAndPassword, 
   signInWithPopup, 
   GoogleAuthProvider,
-  firebaseSignOut
+  firebaseSignOut,
+  sendPasswordResetEmail
 } from '../../lib/firebase';
 
 interface AdminLoginModalProps {
@@ -31,12 +36,15 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   onClose,
   onLoginSuccess,
 }) => {
+  const [role, setRole] = useState('System admin');
   const [email, setEmail] = useState('demmizkenya@gmail.com');
   const [password, setPassword] = useState('G57SHN49g#Daniel');
+  const [showPassword, setShowPassword] = useState(false);
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showResetOption, setShowResetOption] = useState(false);
 
   if (!isOpen) return null;
 
@@ -45,6 +53,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setShowResetOption(false);
 
     const cleanEmail = email.trim().toLowerCase();
 
@@ -63,8 +72,9 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
       } else {
         try {
           userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
-          setSuccess('Authenticated as Admin!');
+          setSuccess('Authenticated as System Admin!');
         } catch (signInErr: any) {
+          console.warn('Initial sign in attempt failed, checking account initialization...', signInErr);
           // If account doesn't exist yet, automatically provision it for the designated admin
           if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
             try {
@@ -72,7 +82,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               setSuccess('Admin account initialized and logged in successfully!');
             } catch (createErr: any) {
               if (createErr.code === 'auth/email-already-in-use') {
-                throw signInErr; // Actual wrong password
+                setShowResetOption(true);
+                throw new Error('Account exists in system. If password differs from previous setup, use "Reset Password" or "Sign In with Google" below.');
               } else {
                 throw createErr;
               }
@@ -99,13 +110,32 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     } catch (err: any) {
       console.error('Auth error:', err);
       if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        setError('Incorrect password for admin account. Please check your credentials.');
+        setError('Incorrect password for admin account. Click "Send Password Reset" or use "Sign In with Google" below.');
+        setShowResetOption(true);
       } else if (err.code === 'auth/email-already-in-use') {
-        setError('Admin email already exists. Switch to Sign In mode.');
+        setError('Admin email already registered. Switch to Sign In mode.');
         setIsRegisterMode(false);
       } else {
         setError(err.message || 'Authentication failed. Please check credentials.');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) {
+      setError('Please provide your admin email address.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, cleanEmail);
+      setSuccess(`Password reset email sent to ${cleanEmail}. Check your inbox to update password.`);
+      setError(null);
+    } catch (err: any) {
+      setError(`Password reset failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -140,7 +170,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in fade-in space-y-6">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in fade-in space-y-5">
         
         {/* Close Button */}
         <button
@@ -165,9 +195,21 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
         {/* Feedback messages */}
         {error && (
-          <div className="p-3.5 bg-red-50 border border-red-200 text-red-900 rounded-2xl text-xs flex items-center gap-2 font-medium">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
-            <span>{error}</span>
+          <div className="p-3.5 bg-red-50 border border-red-200 text-red-900 rounded-2xl text-xs space-y-2 font-medium">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <span>{error}</span>
+            </div>
+            {showResetOption && (
+              <button
+                type="button"
+                onClick={handlePasswordReset}
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-800 text-[11px] font-bold rounded-lg transition-colors mt-1"
+              >
+                <RefreshCw className="w-3 h-3" />
+                <span>Send Password Reset Email to {email}</span>
+              </button>
+            )}
           </div>
         )}
 
@@ -179,7 +221,22 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         )}
 
         {/* Form */}
-        <form onSubmit={handleEmailAuth} className="space-y-4">
+        <form onSubmit={handleEmailAuth} className="space-y-3.5">
+          {/* Role Field */}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <UserCog className="w-3.5 h-3.5 text-indigo-600" /> Administrative Role
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full px-4 py-2.5 text-xs bg-indigo-50/50 border border-indigo-200 text-indigo-950 font-bold rounded-2xl focus:outline-none"
+            >
+              <option value="System admin">System admin (Daniel Owino)</option>
+            </select>
+          </div>
+
+          {/* Email Field */}
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-slate-400" /> Admin Email
@@ -194,18 +251,29 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             />
           </div>
 
+          {/* Password Field */}
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
               <Key className="w-3.5 h-3.5 text-slate-400" /> Password
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 font-medium"
-              placeholder="••••••••••••"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 pr-10 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 font-medium"
+                placeholder="••••••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                title={showPassword ? 'Hide Password' : 'Show Password'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <button
@@ -214,11 +282,11 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-full shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>{loading ? 'Authenticating...' : (isRegisterMode ? 'Register Admin Account' : 'Sign In to Dashboard')}</span>
+            <span>{loading ? 'Authenticating...' : (isRegisterMode ? 'Register Admin Account' : 'Sign In to Admin Panel')}</span>
           </button>
         </form>
 
-        <div className="relative py-1">
+        <div className="relative py-0.5">
           <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200"></div></div>
           <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-white px-2 text-slate-400 font-bold">Or</span></div>
         </div>
@@ -235,7 +303,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         </button>
 
         {/* Toggle Mode */}
-        <div className="text-center pt-2">
+        <div className="text-center pt-1">
           <button
             type="button"
             onClick={() => { setIsRegisterMode(!isRegisterMode); setError(null); }}

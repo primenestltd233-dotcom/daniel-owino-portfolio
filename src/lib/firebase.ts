@@ -7,7 +7,8 @@ import {
   User, 
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
@@ -42,6 +43,7 @@ export {
   onAuthStateChanged, 
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup 
+  signInWithPopup,
+  sendPasswordResetEmail
 };
 export type { User };
