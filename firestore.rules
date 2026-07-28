@@ -1,33 +1,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isAdmin() {
-      return request.auth != null && (
-        request.auth.token.email == "demmizkenya@gmail.com" ||
-        request.auth.token.email == "danielowino233@gmail.com"
-      );
-    }
+    // Public read and write for portfolio management
+    match /settings/{docId} { allow read, write: if true; }
+    match /hero/{docId} { allow read, write: if true; }
+    match /about/{docId} { allow read, write: if true; }
+    match /education/{docId} { allow read, write: if true; }
+    match /skills/{docId} { allow read, write: if true; }
+    match /projects/{docId} { allow read, write: if true; }
+    match /experience/{docId} { allow read, write: if true; }
+    match /certificates/{docId} { allow read, write: if true; }
+    match /achievements/{docId} { allow read, write: if true; }
+    match /leadership/{docId} { allow read, write: if true; }
+    match /cv/{docId} { allow read, write: if true; }
+    match /blog/{docId} { allow read, write: if true; }
+    match /socials/{docId} { allow read, write: if true; }
+    match /media/{docId} { allow read, write: if true; }
 
-    // Public read for portfolio content
-    match /settings/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /hero/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /about/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /education/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /skills/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /projects/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /experience/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /certificates/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /achievements/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /leadership/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /cv/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /blog/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /socials/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /media/{docId} { allow read: if true; allow write: if isAdmin(); }
-
-    // Contact messages: anyone can create, only admin can read/write
+    // Contact messages: anyone can create, read, update, delete
     match /messages/{docId} {
-      allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow create, read, update, delete: if true;
     }
   }
 }

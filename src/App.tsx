@@ -77,8 +77,17 @@ import {
 export default function App() {
   const [activeSection, setActiveSection] = useState<string>('home');
   const [adminUser, setAdminUser] = useState<FirebaseUser | null>(null);
+  const [localAdmin, setLocalAdmin] = useState<boolean>(() => {
+    return sessionStorage.getItem('is_admin_authenticated') === 'true';
+  });
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const effectiveAdminUser = adminUser || (localAdmin ? ({
+    email: sessionStorage.getItem('admin_email') || 'demmizkenya@gmail.com',
+    displayName: 'Daniel Owino (System Admin)',
+    uid: 'system-admin-daniel-owino'
+  } as unknown as FirebaseUser) : null);
 
   // Firestore Data State
   const [settings, setSettings] = useState<SiteSettings>(initialSiteSettings);
@@ -169,7 +178,7 @@ export default function App() {
   };
 
   const handleOpenAdminPortal = () => {
-    if (adminUser) {
+    if (effectiveAdminUser) {
       setIsAdminDashboardOpen(true);
     } else {
       setIsLoginModalOpen(true);
@@ -177,6 +186,10 @@ export default function App() {
   };
 
   const handleLogoutAdmin = async () => {
+    sessionStorage.removeItem('is_admin_authenticated');
+    sessionStorage.removeItem('admin_email');
+    sessionStorage.removeItem('admin_role');
+    setLocalAdmin(false);
     await firebaseSignOut(auth);
     setIsAdminDashboardOpen(false);
   };
@@ -194,7 +207,7 @@ export default function App() {
       <Navbar
         activeSection={activeSection}
         onNavigate={handleNavigate}
-        adminUser={adminUser}
+        adminUser={effectiveAdminUser}
         onOpenAdmin={handleOpenAdminPortal}
         onLogoutAdmin={handleLogoutAdmin}
         logoText={settings.logoText || 'DANIEL OWINO'}
@@ -259,6 +272,7 @@ export default function App() {
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onLoginSuccess={() => {
+          setLocalAdmin(true);
           setIsAdminDashboardOpen(true);
         }}
       />
