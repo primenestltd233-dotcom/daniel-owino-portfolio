@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Home, 
@@ -125,6 +125,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [aboutForm, setAboutForm] = useState<AboutSection>(about);
   const [settingsForm, setSettingsForm] = useState<SiteSettings>(settings);
   const [cvForm, setCvForm] = useState<CVItem>(cv);
+
+  useEffect(() => {
+    setHeroForm(hero);
+  }, [hero]);
+
+  useEffect(() => {
+    setAboutForm(about);
+  }, [about]);
+
+  useEffect(() => {
+    setSettingsForm(settings);
+  }, [settings]);
+
+  useEffect(() => {
+    setCvForm(cv);
+  }, [cv]);
 
   // Modal / Item Edit States
   const [editingItem, setEditingItem] = useState<any | null>(null);
@@ -609,16 +625,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* TAB 3: ABOUT ME */}
           {activeTab === 'about' && (
             <div className="space-y-6 max-w-3xl bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-2xs">
-              <h2 className="text-xl font-bold text-slate-900 border-b pb-3">Edit About Me Section</h2>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 border-b pb-3">Edit About Me Section</h2>
+                <p className="text-xs text-slate-500 mt-1">Manage your professional biography, photo, specializations, and goals.</p>
+              </div>
 
-              <div className="space-y-4 text-xs">
+              <div className="space-y-5 text-xs">
+                {/* About Profile Photo Upload */}
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                  <label className="font-bold text-slate-800 text-xs block">
+                    About Section Profile Photo
+                  </label>
+                  
+                  {aboutForm.profileImageUrl && (
+                    <div className="relative w-36 h-36 rounded-2xl overflow-hidden border border-slate-200 shadow-xs bg-slate-200">
+                      <img
+                        src={aboutForm.profileImageUrl}
+                        alt="About Profile Preview"
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={aboutForm.profileImageUrl || ''}
+                      onChange={(e) => setAboutForm({ ...aboutForm, profileImageUrl: e.target.value })}
+                      className="flex-1 p-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-indigo-500"
+                      placeholder="Paste image URL or click Upload..."
+                    />
+                    <label className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold cursor-pointer flex items-center justify-center gap-2 shadow-xs transition-colors shrink-0">
+                      <Upload className="w-4 h-4" />
+                      <span>Upload New Image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleFileUpload(e, (url) => setAboutForm({ ...aboutForm, profileImageUrl: url }))}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    This photo appears on the About Me card alongside your key focus areas.
+                  </p>
+                </div>
+
                 <div>
                   <label className="font-bold text-slate-700">Personal Intro Line</label>
                   <input
                     type="text"
-                    value={aboutForm.personalIntro}
+                    value={aboutForm.personalIntro || ''}
                     onChange={(e) => setAboutForm({ ...aboutForm, personalIntro: e.target.value })}
-                    className="w-full mt-1 p-2.5 bg-slate-50 border rounded-xl"
+                    className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
                   />
                 </div>
 
@@ -626,37 +686,97 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <label className="font-bold text-slate-700">Full Professional Biography</label>
                   <textarea
                     rows={6}
-                    value={aboutForm.biography}
+                    value={aboutForm.biography || ''}
                     onChange={(e) => setAboutForm({ ...aboutForm, biography: e.target.value })}
-                    className="w-full mt-1 p-2.5 bg-slate-50 border rounded-xl"
+                    className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-bold text-slate-700">Mission Statement</label>
+                    <textarea
+                      rows={3}
+                      value={aboutForm.mission || ''}
+                      onChange={(e) => setAboutForm({ ...aboutForm, mission: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-700">Vision Statement</label>
+                    <textarea
+                      rows={3}
+                      value={aboutForm.vision || ''}
+                      onChange={(e) => setAboutForm({ ...aboutForm, vision: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700">Key Focus Areas / Specializations (Comma-separated)</label>
+                  <input
+                    type="text"
+                    value={aboutForm.specializations?.join(', ') || ''}
+                    onChange={(e) => setAboutForm({
+                      ...aboutForm,
+                      specializations: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                    })}
+                    className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    placeholder="Full Stack Engineering, System Architecture, Cloud Services"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Mission Statement</label>
-                  <textarea
-                    rows={2}
-                    value={aboutForm.mission}
-                    onChange={(e) => setAboutForm({ ...aboutForm, mission: e.target.value })}
-                    className="w-full mt-1 p-2.5 bg-slate-50 border rounded-xl"
+                  <label className="font-bold text-slate-700">Core Engineering Values (Comma-separated)</label>
+                  <input
+                    type="text"
+                    value={aboutForm.values?.join(', ') || ''}
+                    onChange={(e) => setAboutForm({
+                      ...aboutForm,
+                      values: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                    })}
+                    className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    placeholder="Clean Code, Scalable Infrastructure, User-Centric Design"
                   />
                 </div>
 
-                <div>
-                  <label className="font-bold text-slate-700">Vision Statement</label>
-                  <textarea
-                    rows={2}
-                    value={aboutForm.vision}
-                    onChange={(e) => setAboutForm({ ...aboutForm, vision: e.target.value })}
-                    className="w-full mt-1 p-2.5 bg-slate-50 border rounded-xl"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-bold text-slate-700">Short-Term Objectives (Comma-separated)</label>
+                    <textarea
+                      rows={2}
+                      value={aboutForm.shortTermGoals?.join(', ') || ''}
+                      onChange={(e) => setAboutForm({
+                        ...aboutForm,
+                        shortTermGoals: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                      })}
+                      className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+                      placeholder="Master Cloud Architecture, Contribute to Open Source"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-700">Long-Term Objectives (Comma-separated)</label>
+                    <textarea
+                      rows={2}
+                      value={aboutForm.longTermGoals?.join(', ') || ''}
+                      onChange={(e) => setAboutForm({
+                        ...aboutForm,
+                        longTermGoals: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                      })}
+                      className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+                      placeholder="Lead Enterprise Technical Teams, Build High-Impact Systems"
+                    />
+                  </div>
                 </div>
 
                 <button
                   onClick={handleSaveAbout}
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs shadow-sm flex items-center gap-2"
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full text-xs shadow-md shadow-indigo-600/20 flex items-center gap-2 transition-all"
                 >
-                  <Save className="w-4 h-4" /> Save About Details
+                  <Save className="w-4 h-4" /> Save About Details & Image
                 </button>
               </div>
             </div>
