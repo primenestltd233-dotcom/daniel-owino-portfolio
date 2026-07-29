@@ -73,11 +73,11 @@ export const Hero: React.FC<HeroProps> = ({
               {/* Requirement 6: Animated Wave Text for "DANIEL OWINO" */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] mb-4 tracking-tighter">
                 Hi, I'm{' '}
-                <span className="inline-inline-flex flex-wrap text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700">
+                <span className="inline-flex flex-wrap">
                   {(data.fullName || 'DANIEL OWINO').split('').map((char, idx) => (
                     <span
                       key={idx}
-                      className="inline-block animate-wave-letter hover:text-indigo-500 transition-colors"
+                      className="inline-block animate-wave-letter text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:text-indigo-500 transition-colors"
                       style={{ 
                         animationDelay: `${idx * 0.08}s`,
                         whiteSpace: char === ' ' ? 'pre' : 'normal'

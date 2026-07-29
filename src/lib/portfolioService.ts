@@ -200,6 +200,9 @@ export function subscribeSettings(callback: (data: SiteSettings) => void) {
 
 export async function updateSettings(data: Partial<SiteSettings>) {
   const ref = doc(db, 'settings', 'config');
+  const existingCache = loadCache<SiteSettings>('settings') || initialSiteSettings;
+  const merged = { ...existingCache, ...data };
+  saveCache('settings', merged);
   await setDoc(ref, data, { merge: true });
 }
 
@@ -224,6 +227,9 @@ export function subscribeHero(callback: (data: HeroSection) => void) {
 
 export async function updateHero(data: Partial<HeroSection>) {
   const ref = doc(db, 'hero', 'main');
+  const existingCache = loadCache<HeroSection>('hero') || initialHero;
+  const merged = { ...existingCache, ...data };
+  saveCache('hero', merged);
   await setDoc(ref, data, { merge: true });
 }
 
@@ -248,6 +254,9 @@ export function subscribeAbout(callback: (data: AboutSection) => void) {
 
 export async function updateAbout(data: Partial<AboutSection>) {
   const ref = doc(db, 'about', 'main');
+  const existingCache = loadCache<AboutSection>('about') || initialAbout;
+  const merged = { ...existingCache, ...data };
+  saveCache('about', merged);
   await setDoc(ref, data, { merge: true });
 }
 
