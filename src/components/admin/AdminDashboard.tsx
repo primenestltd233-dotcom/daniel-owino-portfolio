@@ -27,7 +27,8 @@ import {
   Copy,
   ExternalLink,
   Sparkles,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Loader2
 } from 'lucide-react';
 import { 
   HeroSection, 
@@ -128,48 +129,64 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   useEffect(() => { setSettingsForm(settings); }, [settings]);
   useEffect(() => { setCvForm(cv); }, [cv]);
 
-  // Modal / Item Edit States
   const [editingItem, setEditingItem] = useState<any | null>(null);
   const [editingType, setEditingType] = useState<string | null>(null);
+  const [savingSection, setSavingSection] = useState<string | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3500);
+    setTimeout(() => setToast(null), 4000);
   };
 
   const handleSaveHero = async () => {
+    setSavingSection('hero');
     try {
       await updateHero(heroForm);
-      showToast('Hero section saved persistently!');
+      showToast('Saved ✓ — Hero section stored permanently in database!', 'success');
     } catch (err: any) {
-      showToast('Failed to save hero section', 'error');
+      console.error('Save Hero Error:', err);
+      showToast(`Save failed — changes were NOT stored. (${err?.message || 'Database error'})`, 'error');
+    } finally {
+      setSavingSection(null);
     }
   };
 
   const handleSaveAbout = async () => {
+    setSavingSection('about');
     try {
       await updateAbout(aboutForm);
-      showToast('About Me details & Core Values saved!');
+      showToast('Saved ✓ — About Me details & Core Values stored in database!', 'success');
     } catch (err: any) {
-      showToast('Failed to save About section', 'error');
+      console.error('Save About Error:', err);
+      showToast(`Save failed — changes were NOT stored. (${err?.message || 'Database error'})`, 'error');
+    } finally {
+      setSavingSection(null);
     }
   };
 
   const handleSaveSettings = async () => {
+    setSavingSection('settings');
     try {
       await updateSettings(settingsForm);
-      showToast('Site settings & Contact details saved!');
+      showToast('Saved ✓ — Contact details & Site settings stored in database!', 'success');
     } catch (err: any) {
-      showToast('Failed to save site settings', 'error');
+      console.error('Save Settings Error:', err);
+      showToast(`Save failed — changes were NOT stored. (${err?.message || 'Database error'})`, 'error');
+    } finally {
+      setSavingSection(null);
     }
   };
 
   const handleSaveCV = async () => {
+    setSavingSection('cv');
     try {
       await updateCV(cvForm);
-      showToast('CV & Resume record saved persistently!');
+      showToast('Saved ✓ — CV & Resume record stored permanently in database!', 'success');
     } catch (err: any) {
-      showToast('Failed to update CV', 'error');
+      console.error('Save CV Error:', err);
+      showToast(`Save failed — changes were NOT stored. (${err?.message || 'Database error'})`, 'error');
+    } finally {
+      setSavingSection(null);
     }
   };
 
@@ -212,6 +229,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Generic Save Handler for Item Modals
   const handleSaveGenericItem = async () => {
     if (!editingItem || !editingType) return;
+    setSavingSection('modal');
     try {
       switch (editingType) {
         case 'education':
@@ -263,11 +281,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           await saveSocialLink(editingItem);
           break;
       }
-      showToast(`${editingType.toUpperCase()} saved successfully!`);
+      showToast(`Saved ✓ — ${editingType.toUpperCase()} item stored permanently in database!`, 'success');
       setEditingItem(null);
       setEditingType(null);
     } catch (err: any) {
-      showToast(`Failed to save ${editingType}: ${err?.message || 'Error'}`, 'error');
+      console.error('Save Generic Item Error:', err);
+      showToast(`Failed to save ${editingType}: ${err?.message || 'Database error'}`, 'error');
+    } finally {
+      setSavingSection(null);
     }
   };
 
@@ -631,9 +652,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                 <button
                   onClick={handleSaveHero}
-                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full text-xs shadow-md shadow-indigo-600/20 flex items-center gap-2"
+                  disabled={savingSection === 'hero'}
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-full text-xs shadow-md shadow-indigo-600/20 flex items-center gap-2 transition-all"
                 >
-                  <Save className="w-4 h-4" /> Save Hero Section
+                  {savingSection === 'hero' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving to Database...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Save Hero Section</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -834,9 +866,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                 <button
                   onClick={handleSaveAbout}
-                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full text-xs shadow-md shadow-indigo-600/20 flex items-center gap-2"
+                  disabled={savingSection === 'about'}
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-full text-xs shadow-md shadow-indigo-600/20 flex items-center gap-2 transition-all"
                 >
-                  <Save className="w-4 h-4" /> Save About Details & Core Values
+                  {savingSection === 'about' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving to Database...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Save About Details & Core Values</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -1733,9 +1776,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                 <button
                   onClick={handleSaveSettings}
-                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full text-xs shadow-md shadow-indigo-600/20 flex items-center gap-2"
+                  disabled={savingSection === 'settings'}
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-full text-xs shadow-md shadow-indigo-600/20 flex items-center gap-2 transition-all"
                 >
-                  <Save className="w-4 h-4" /> Save Contact Details & Settings
+                  {savingSection === 'settings' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving to Database...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Save Contact Details & Settings</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -2211,8 +2265,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <button onClick={() => setEditingItem(null)} className="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs">
                   Cancel
                 </button>
-                <button onClick={handleSaveGenericItem} className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-600/20 flex items-center gap-1.5">
-                  <Save className="w-4 h-4" /> Save Record
+                <button
+                  onClick={handleSaveGenericItem}
+                  disabled={savingSection === 'modal'}
+                  className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-600/20 flex items-center gap-1.5 transition-all"
+                >
+                  {savingSection === 'modal' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Save Record</span>
+                    </>
+                  )}
                 </button>
               </div>
 

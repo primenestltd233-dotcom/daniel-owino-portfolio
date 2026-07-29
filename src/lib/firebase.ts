@@ -10,7 +10,7 @@ import {
   signInWithPopup,
   sendPasswordResetEmail
 } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore, getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import firebaseConfigData from '../../firebase-applet-config.json';
 
@@ -29,11 +29,12 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 // Initialize Services
 export const auth = getAuth(app);
 
-// Use named firestore database ID from config if provided
-export const db = getFirestore(
-  app, 
-  firebaseConfigData.firestoreDatabaseId || '(default)'
-);
+// Use named firestore database ID with ignoreUndefinedProperties enabled
+export const db = getApps().length > 1
+  ? getFirestore(app, firebaseConfigData.firestoreDatabaseId || '(default)')
+  : initializeFirestore(app, {
+      ignoreUndefinedProperties: true,
+    }, firebaseConfigData.firestoreDatabaseId || '(default)');
 
 export const storage = getStorage(app);
 

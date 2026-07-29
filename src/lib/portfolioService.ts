@@ -7,9 +7,7 @@ import {
   updateDoc, 
   deleteDoc, 
   addDoc, 
-  onSnapshot,
-  query,
-  orderBy
+  onSnapshot
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { 
@@ -45,8 +43,28 @@ import {
   initialSiteSettings 
 } from './seedData';
 
+// Helper function to strip `undefined` fields recursively before saving to Firestore
+export function sanitizeForFirestore<T>(data: T): T {
+  if (data === null || data === undefined) {
+    return data;
+  }
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeForFirestore(item)) as unknown as T;
+  }
+  if (typeof data === 'object') {
+    const clean: Record<string, any> = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined) {
+        clean[key] = sanitizeForFirestore(value);
+      }
+    }
+    return clean as T;
+  }
+  return data;
+}
+
 // Storage keys for offline or quick fallback caching
-const CACHE_KEY = 'daniel_owino_portfolio_cache_v1';
+const CACHE_KEY = 'daniel_owino_portfolio_cache_v2';
 
 function loadCache<T>(key: string): T | null {
   try {
@@ -71,32 +89,40 @@ let isSeeded = false;
 export async function ensureInitialSeed() {
   if (isSeeded) return;
   try {
+    // Check if seeding has already been performed in this Firestore database
+    const seedFlagRef = doc(db, 'settings', 'seed_flag');
+    const seedFlagSnap = await getDoc(seedFlagRef);
+    if (seedFlagSnap.exists()) {
+      isSeeded = true;
+      return;
+    }
+
     // Check settings doc
     const settingsRef = doc(db, 'settings', 'config');
     const settingsSnap = await getDoc(settingsRef);
     if (!settingsSnap.exists()) {
-      await setDoc(settingsRef, initialSiteSettings);
+      await setDoc(settingsRef, sanitizeForFirestore(initialSiteSettings));
     }
 
     // Check hero doc
     const heroRef = doc(db, 'hero', 'main');
     const heroSnap = await getDoc(heroRef);
     if (!heroSnap.exists()) {
-      await setDoc(heroRef, initialHero);
+      await setDoc(heroRef, sanitizeForFirestore(initialHero));
     }
 
     // Check about doc
     const aboutRef = doc(db, 'about', 'main');
     const aboutSnap = await getDoc(aboutRef);
     if (!aboutSnap.exists()) {
-      await setDoc(aboutRef, initialAbout);
+      await setDoc(aboutRef, sanitizeForFirestore(initialAbout));
     }
 
     // Check education collection
     const eduSnap = await getDocs(collection(db, 'education'));
     if (eduSnap.empty) {
       for (const item of initialEducation) {
-        await setDoc(doc(db, 'education', item.id), item);
+        await setDoc(doc(db, 'education', item.id), sanitizeForFirestore(item));
       }
     }
 
@@ -104,7 +130,7 @@ export async function ensureInitialSeed() {
     const skillsSnap = await getDocs(collection(db, 'skills'));
     if (skillsSnap.empty) {
       for (const item of initialSkills) {
-        await setDoc(doc(db, 'skills', item.id), item);
+        await setDoc(doc(db, 'skills', item.id), sanitizeForFirestore(item));
       }
     }
 
@@ -112,7 +138,7 @@ export async function ensureInitialSeed() {
     const projSnap = await getDocs(collection(db, 'projects'));
     if (projSnap.empty) {
       for (const item of initialProjects) {
-        await setDoc(doc(db, 'projects', item.id), item);
+        await setDoc(doc(db, 'projects', item.id), sanitizeForFirestore(item));
       }
     }
 
@@ -120,7 +146,7 @@ export async function ensureInitialSeed() {
     const expSnap = await getDocs(collection(db, 'experience'));
     if (expSnap.empty) {
       for (const item of initialExperience) {
-        await setDoc(doc(db, 'experience', item.id), item);
+        await setDoc(doc(db, 'experience', item.id), sanitizeForFirestore(item));
       }
     }
 
@@ -128,7 +154,7 @@ export async function ensureInitialSeed() {
     const certSnap = await getDocs(collection(db, 'certificates'));
     if (certSnap.empty) {
       for (const item of initialCertificates) {
-        await setDoc(doc(db, 'certificates', item.id), item);
+        await setDoc(doc(db, 'certificates', item.id), sanitizeForFirestore(item));
       }
     }
 
@@ -136,7 +162,7 @@ export async function ensureInitialSeed() {
     const achSnap = await getDocs(collection(db, 'achievements'));
     if (achSnap.empty) {
       for (const item of initialAchievements) {
-        await setDoc(doc(db, 'achievements', item.id), item);
+        await setDoc(doc(db, 'achievements', item.id), sanitizeForFirestore(item));
       }
     }
 
@@ -144,7 +170,7 @@ export async function ensureInitialSeed() {
     const leadSnap = await getDocs(collection(db, 'leadership'));
     if (leadSnap.empty) {
       for (const item of initialLeadership) {
-        await setDoc(doc(db, 'leadership', item.id), item);
+        await setDoc(doc(db, 'leadership', item.id), sanitizeForFirestore(item));
       }
     }
 
@@ -152,14 +178,14 @@ export async function ensureInitialSeed() {
     const cvRef = doc(db, 'cv', 'main');
     const cvSnap = await getDoc(cvRef);
     if (!cvSnap.exists()) {
-      await setDoc(cvRef, initialCV);
+      await setDoc(cvRef, sanitizeForFirestore(initialCV));
     }
 
     // Check blog collection
     const blogSnap = await getDocs(collection(db, 'blog'));
     if (blogSnap.empty) {
       for (const item of initialBlogPosts) {
-        await setDoc(doc(db, 'blog', item.id), item);
+        await setDoc(doc(db, 'blog', item.id), sanitizeForFirestore(item));
       }
     }
 
@@ -167,10 +193,12 @@ export async function ensureInitialSeed() {
     const socSnap = await getDocs(collection(db, 'socials'));
     if (socSnap.empty) {
       for (const item of initialSocials) {
-        await setDoc(doc(db, 'socials', item.id), item);
+        await setDoc(doc(db, 'socials', item.id), sanitizeForFirestore(item));
       }
     }
 
+    // Mark database as seeded permanently so future reloads won't re-seed
+    await setDoc(seedFlagRef, { seeded: true, timestamp: new Date().toISOString() });
     isSeeded = true;
   } catch (err) {
     console.warn('Firestore seed check notice:', err);
@@ -193,17 +221,17 @@ export function subscribeSettings(callback: (data: SiteSettings) => void) {
     } else {
       callback(initialSiteSettings);
     }
-  }, () => {
+  }, (err) => {
+    console.error('subscribeSettings error:', err);
     callback(cached || initialSiteSettings);
   });
 }
 
 export async function updateSettings(data: Partial<SiteSettings>) {
   const ref = doc(db, 'settings', 'config');
-  const existingCache = loadCache<SiteSettings>('settings') || initialSiteSettings;
-  const merged = { ...existingCache, ...data };
-  saveCache('settings', merged);
-  await setDoc(ref, data, { merge: true });
+  const cleanData = sanitizeForFirestore(data);
+  await setDoc(ref, cleanData, { merge: true });
+  saveCache('settings', cleanData as SiteSettings);
 }
 
 // 2. Hero Section
@@ -220,17 +248,17 @@ export function subscribeHero(callback: (data: HeroSection) => void) {
     } else {
       callback(initialHero);
     }
-  }, () => {
+  }, (err) => {
+    console.error('subscribeHero error:', err);
     callback(cached || initialHero);
   });
 }
 
 export async function updateHero(data: Partial<HeroSection>) {
   const ref = doc(db, 'hero', 'main');
-  const existingCache = loadCache<HeroSection>('hero') || initialHero;
-  const merged = { ...existingCache, ...data };
-  saveCache('hero', merged);
-  await setDoc(ref, data, { merge: true });
+  const cleanData = sanitizeForFirestore(data);
+  await setDoc(ref, cleanData, { merge: true });
+  saveCache('hero', cleanData as HeroSection);
 }
 
 // 3. About Section
@@ -247,17 +275,17 @@ export function subscribeAbout(callback: (data: AboutSection) => void) {
     } else {
       callback(initialAbout);
     }
-  }, () => {
+  }, (err) => {
+    console.error('subscribeAbout error:', err);
     callback(cached || initialAbout);
   });
 }
 
 export async function updateAbout(data: Partial<AboutSection>) {
   const ref = doc(db, 'about', 'main');
-  const existingCache = loadCache<AboutSection>('about') || initialAbout;
-  const merged = { ...existingCache, ...data };
-  saveCache('about', merged);
-  await setDoc(ref, data, { merge: true });
+  const cleanData = sanitizeForFirestore(data);
+  await setDoc(ref, cleanData, { merge: true });
+  saveCache('about', cleanData as AboutSection);
 }
 
 // 4. Education
@@ -274,14 +302,16 @@ export function subscribeEducation(callback: (items: EducationItem[]) => void) {
     items.sort((a, b) => (a.order || 0) - (b.order || 0));
     saveCache('education', items);
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeEducation error:', err);
     callback(cached || initialEducation);
   });
 }
 
 export async function saveEducationItem(item: EducationItem) {
   const id = item.id || `edu_${Date.now()}`;
-  await setDoc(doc(db, 'education', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'education', id), cleanItem, { merge: true });
 }
 
 export async function deleteEducationItem(id: string) {
@@ -302,14 +332,16 @@ export function subscribeSkills(callback: (items: SkillItem[]) => void) {
     items.sort((a, b) => (a.order || 0) - (b.order || 0));
     saveCache('skills', items);
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeSkills error:', err);
     callback(cached || initialSkills);
   });
 }
 
 export async function saveSkillItem(item: SkillItem) {
   const id = item.id || `sk_${Date.now()}`;
-  await setDoc(doc(db, 'skills', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'skills', id), cleanItem, { merge: true });
 }
 
 export async function deleteSkillItem(id: string) {
@@ -330,14 +362,16 @@ export function subscribeProjects(callback: (items: ProjectItem[]) => void) {
     items.sort((a, b) => (a.order || 0) - (b.order || 0));
     saveCache('projects', items);
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeProjects error:', err);
     callback(cached || initialProjects);
   });
 }
 
 export async function saveProjectItem(item: ProjectItem) {
   const id = item.id || `proj_${Date.now()}`;
-  await setDoc(doc(db, 'projects', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'projects', id), cleanItem, { merge: true });
 }
 
 export async function deleteProjectItem(id: string) {
@@ -358,14 +392,16 @@ export function subscribeExperience(callback: (items: ExperienceItem[]) => void)
     items.sort((a, b) => (a.order || 0) - (b.order || 0));
     saveCache('experience', items);
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeExperience error:', err);
     callback(cached || initialExperience);
   });
 }
 
 export async function saveExperienceItem(item: ExperienceItem) {
   const id = item.id || `exp_${Date.now()}`;
-  await setDoc(doc(db, 'experience', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'experience', id), cleanItem, { merge: true });
 }
 
 export async function deleteExperienceItem(id: string) {
@@ -386,14 +422,16 @@ export function subscribeCertificates(callback: (items: CertificateItem[]) => vo
     items.sort((a, b) => (a.order || 0) - (b.order || 0));
     saveCache('certificates', items);
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeCertificates error:', err);
     callback(cached || initialCertificates);
   });
 }
 
 export async function saveCertificateItem(item: CertificateItem) {
   const id = item.id || `cert_${Date.now()}`;
-  await setDoc(doc(db, 'certificates', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'certificates', id), cleanItem, { merge: true });
 }
 
 export async function deleteCertificateItem(id: string) {
@@ -414,14 +452,16 @@ export function subscribeAchievements(callback: (items: AchievementItem[]) => vo
     items.sort((a, b) => (a.order || 0) - (b.order || 0));
     saveCache('achievements', items);
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeAchievements error:', err);
     callback(cached || initialAchievements);
   });
 }
 
 export async function saveAchievementItem(item: AchievementItem) {
   const id = item.id || `ach_${Date.now()}`;
-  await setDoc(doc(db, 'achievements', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'achievements', id), cleanItem, { merge: true });
 }
 
 export async function deleteAchievementItem(id: string) {
@@ -442,14 +482,16 @@ export function subscribeLeadership(callback: (items: LeadershipItem[]) => void)
     items.sort((a, b) => (a.order || 0) - (b.order || 0));
     saveCache('leadership', items);
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeLeadership error:', err);
     callback(cached || initialLeadership);
   });
 }
 
 export async function saveLeadershipItem(item: LeadershipItem) {
   const id = item.id || `lead_${Date.now()}`;
-  await setDoc(doc(db, 'leadership', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'leadership', id), cleanItem, { merge: true });
 }
 
 export async function deleteLeadershipItem(id: string) {
@@ -470,14 +512,17 @@ export function subscribeCV(callback: (data: CVItem) => void) {
     } else {
       callback(initialCV);
     }
-  }, () => {
+  }, (err) => {
+    console.error('subscribeCV error:', err);
     callback(cached || initialCV);
   });
 }
 
 export async function updateCV(data: Partial<CVItem>) {
   const ref = doc(db, 'cv', 'main');
-  await setDoc(ref, data, { merge: true });
+  const cleanData = sanitizeForFirestore(data);
+  await setDoc(ref, cleanData, { merge: true });
+  saveCache('cv', cleanData as CVItem);
 }
 
 // 12. Blog
@@ -494,14 +539,16 @@ export function subscribeBlog(callback: (items: BlogPost[]) => void) {
     items.sort((a, b) => (b.publicationDate || '').localeCompare(a.publicationDate || ''));
     saveCache('blog', items);
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeBlog error:', err);
     callback(cached || initialBlogPosts);
   });
 }
 
 export async function saveBlogPost(item: BlogPost) {
   const id = item.id || `blog_${Date.now()}`;
-  await setDoc(doc(db, 'blog', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'blog', id), cleanItem, { merge: true });
 }
 
 export async function deleteBlogPost(id: string) {
@@ -526,17 +573,17 @@ export function subscribeMessages(callback: (items: ContactMessage[]) => void) {
 
 export async function sendContactMessage(msg: Omit<ContactMessage, 'id' | 'createdAt' | 'read' | 'archived'>) {
   const colRef = collection(db, 'messages');
-  const newDoc: Omit<ContactMessage, 'id'> = {
+  const newDoc: Omit<ContactMessage, 'id'> = sanitizeForFirestore({
     ...msg,
     createdAt: new Date().toISOString(),
     read: false,
     archived: false,
-  };
+  });
   await addDoc(colRef, newDoc);
 }
 
 export async function updateMessageStatus(id: string, updates: Partial<ContactMessage>) {
-  await updateDoc(doc(db, 'messages', id), updates);
+  await updateDoc(doc(db, 'messages', id), sanitizeForFirestore(updates));
 }
 
 export async function deleteMessage(id: string) {
@@ -557,14 +604,16 @@ export function subscribeSocials(callback: (items: SocialLink[]) => void) {
     items.sort((a, b) => (a.order || 0) - (b.order || 0));
     saveCache('socials', items);
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeSocials error:', err);
     callback(cached || initialSocials);
   });
 }
 
 export async function saveSocialLink(item: SocialLink) {
   const id = item.id || `soc_${Date.now()}`;
-  await setDoc(doc(db, 'socials', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'socials', id), cleanItem, { merge: true });
 }
 
 export async function deleteSocialLink(id: string) {
@@ -581,14 +630,16 @@ export function subscribeMedia(callback: (items: MediaItem[]) => void) {
     });
     items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
     callback(items);
-  }, () => {
+  }, (err) => {
+    console.error('subscribeMedia error:', err);
     callback([]);
   });
 }
 
 export async function saveMediaItem(item: MediaItem) {
   const id = item.id || `med_${Date.now()}`;
-  await setDoc(doc(db, 'media', id), { ...item, id }, { merge: true });
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  await setDoc(doc(db, 'media', id), cleanItem, { merge: true });
 }
 
 export async function deleteMediaItem(id: string) {
