@@ -66,7 +66,7 @@ export function sanitizeForFirestore<T>(data: T): T {
 // Storage keys for offline or quick fallback caching
 const CACHE_KEY = 'daniel_owino_portfolio_cache_v2';
 
-function loadCache<T>(key: string): T | null {
+export function loadCache<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(`${CACHE_KEY}_${key}`);
     return raw ? JSON.parse(raw) : null;
@@ -75,7 +75,7 @@ function loadCache<T>(key: string): T | null {
   }
 }
 
-function saveCache<T>(key: string, data: T) {
+export function saveCache<T>(key: string, data: T) {
   try {
     localStorage.setItem(`${CACHE_KEY}_${key}`, JSON.stringify(data));
   } catch {

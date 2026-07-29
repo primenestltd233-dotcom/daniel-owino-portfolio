@@ -72,13 +72,20 @@ export const About: React.FC<AboutProps> = ({ data }) => {
 
           {/* Photo & Specialization Bento Box */}
           <div className="lg:col-span-4 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4 flex flex-col justify-between">
-            <div className="relative rounded-2xl overflow-hidden h-64 bg-slate-100 border border-slate-100">
-              <img
-                src={data.profileImageUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80'}
-                alt="Daniel Owino"
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
+            <div className="relative rounded-2xl overflow-hidden h-64 bg-slate-900 border border-slate-800 flex items-center justify-center">
+              {data.profileImageUrl ? (
+                <img
+                  src={data.profileImageUrl}
+                  alt="Daniel Owino"
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center text-slate-400 space-y-1 p-4">
+                  <User className="w-12 h-12 text-slate-500" />
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Daniel Owino</span>
+                </div>
+              )}
             </div>
             
             {/* Specializations list */}

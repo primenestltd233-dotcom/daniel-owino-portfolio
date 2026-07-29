@@ -8,7 +8,8 @@ import {
   ChevronRight, 
   X, 
   Tag,
-  Share2
+  Share2,
+  FileText
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { BlogPost } from '../../types';
@@ -95,13 +96,19 @@ export const BlogView: React.FC<BlogViewProps> = ({ items }) => {
                 onClick={() => setActivePost(post)}
               >
                 <div className="space-y-3">
-                  <div className="relative h-48 rounded-2xl overflow-hidden bg-slate-100">
-                    <img
-                      src={post.featuredImageUrl || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80'}
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      referrerPolicy="no-referrer"
-                    />
+                  <div className="relative h-48 rounded-2xl overflow-hidden bg-slate-900 flex items-center justify-center">
+                    {post.featuredImageUrl ? (
+                      <img
+                        src={post.featuredImageUrl}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-indigo-900 to-slate-900 flex items-center justify-center p-4">
+                        <FileText className="w-10 h-10 text-indigo-400/60" />
+                      </div>
+                    )}
                     <span className="absolute top-3 left-3 px-3 py-1 bg-indigo-600 text-white text-[10px] font-extrabold uppercase tracking-wider rounded-full shadow-sm">
                       {post.category}
                     </span>

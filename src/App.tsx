@@ -25,6 +25,7 @@ import {
 } from './lib/firebase';
 import { 
   ensureInitialSeed, 
+  loadCache,
   subscribeSettings, 
   subscribeHero, 
   subscribeAbout, 
@@ -91,20 +92,20 @@ export default function App() {
   } as unknown as FirebaseUser) : null);
 
   // Firestore Data State
-  const [settings, setSettings] = useState<SiteSettings>(initialSiteSettings);
-  const [hero, setHero] = useState<HeroSection>(initialHero);
-  const [about, setAbout] = useState<AboutSection>(initialAbout);
-  const [education, setEducation] = useState<EducationItem[]>(initialEducation);
-  const [skills, setSkills] = useState<SkillItem[]>(initialSkills);
-  const [projects, setProjects] = useState<ProjectItem[]>(initialProjects);
-  const [experience, setExperience] = useState<ExperienceItem[]>(initialExperience);
-  const [certificates, setCertificates] = useState<CertificateItem[]>(initialCertificates);
-  const [achievements, setAchievements] = useState<AchievementItem[]>(initialAchievements);
-  const [leadership, setLeadership] = useState<LeadershipItem[]>(initialLeadership);
-  const [cv, setCV] = useState<CVItem>(initialCV);
-  const [blog, setBlog] = useState<BlogPost[]>(initialBlogPosts);
+  const [settings, setSettings] = useState<SiteSettings>(() => loadCache<SiteSettings>('settings') || initialSiteSettings);
+  const [hero, setHero] = useState<HeroSection>(() => loadCache<HeroSection>('hero') || initialHero);
+  const [about, setAbout] = useState<AboutSection>(() => loadCache<AboutSection>('about') || initialAbout);
+  const [education, setEducation] = useState<EducationItem[]>(() => loadCache<EducationItem[]>('education') || initialEducation);
+  const [skills, setSkills] = useState<SkillItem[]>(() => loadCache<SkillItem[]>('skills') || initialSkills);
+  const [projects, setProjects] = useState<ProjectItem[]>(() => loadCache<ProjectItem[]>('projects') || initialProjects);
+  const [experience, setExperience] = useState<ExperienceItem[]>(() => loadCache<ExperienceItem[]>('experience') || initialExperience);
+  const [certificates, setCertificates] = useState<CertificateItem[]>(() => loadCache<CertificateItem[]>('certificates') || initialCertificates);
+  const [achievements, setAchievements] = useState<AchievementItem[]>(() => loadCache<AchievementItem[]>('achievements') || initialAchievements);
+  const [leadership, setLeadership] = useState<LeadershipItem[]>(() => loadCache<LeadershipItem[]>('leadership') || initialLeadership);
+  const [cv, setCV] = useState<CVItem>(() => loadCache<CVItem>('cv') || initialCV);
+  const [blog, setBlog] = useState<BlogPost[]>(() => loadCache<BlogPost[]>('blog') || initialBlogPosts);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
-  const [socials, setSocials] = useState<SocialLink[]>(initialSocials);
+  const [socials, setSocials] = useState<SocialLink[]>(() => loadCache<SocialLink[]>('socials') || initialSocials);
   const [media, setMedia] = useState<MediaItem[]>([]);
 
   // 1. Initialize Firestore Database Seed & Firebase Auth Listener

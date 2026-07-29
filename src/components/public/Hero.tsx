@@ -8,7 +8,8 @@ import {
   GraduationCap, 
   CalendarCheck,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  User
 } from 'lucide-react';
 import { HeroSection } from '../../types';
 
@@ -130,13 +131,20 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Bento Tile 2: Verified Profile Card & Live Status (4 cols) */}
           <div className="lg:col-span-4 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
             
-            <div className="relative rounded-2xl overflow-hidden h-48 bg-slate-100 border border-slate-100">
-              <img
-                src={data.profileImageUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80'}
-                alt={data.fullName}
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
+            <div className="relative rounded-2xl overflow-hidden h-48 bg-slate-900 border border-slate-800 flex items-center justify-center">
+              {data.profileImageUrl ? (
+                <img
+                  src={data.profileImageUrl}
+                  alt={data.fullName}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center text-slate-400 space-y-1 p-4">
+                  <User className="w-10 h-10 text-slate-500" />
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">{data.fullName || 'Daniel Owino'}</span>
+                </div>
+              )}
               <div className="absolute top-3 right-3 px-2.5 py-1 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold rounded-full flex items-center gap-1.5 uppercase tracking-wider">
                 <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Verified
               </div>

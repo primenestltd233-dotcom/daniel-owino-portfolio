@@ -144,13 +144,17 @@ export const Certificates: React.FC<CertificatesProps> = ({ items }) => {
                     Open PDF Document <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-              ) : (
+              ) : selectedCert.certificateFileUrl ? (
                 <img
-                  src={selectedCert.certificateFileUrl || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=800&q=80'}
+                  src={selectedCert.certificateFileUrl}
                   alt={selectedCert.title}
                   className="w-full max-h-[400px] object-contain"
                   referrerPolicy="no-referrer"
                 />
+              ) : (
+                <div className="p-8 text-center text-slate-500 text-sm font-semibold">
+                  Certificate image preview unavailable
+                </div>
               )}
             </div>
 

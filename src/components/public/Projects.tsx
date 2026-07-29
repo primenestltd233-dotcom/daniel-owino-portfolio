@@ -14,7 +14,8 @@ import {
   Target, 
   Lightbulb, 
   AlertCircle,
-  Trophy
+  Trophy,
+  FolderGit2
 } from 'lucide-react';
 import { ProjectItem } from '../../types';
 
@@ -103,13 +104,19 @@ export const Projects: React.FC<ProjectsProps> = ({ items }) => {
                 className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all flex flex-col overflow-hidden group p-5 space-y-4 justify-between"
               >
                 {/* Thumbnail Image */}
-                <div className="relative h-48 overflow-hidden bg-slate-100 rounded-2xl">
-                  <img
-                    src={project.thumbnailUrl || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80'}
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    referrerPolicy="no-referrer"
-                  />
+                <div className="relative h-48 overflow-hidden bg-slate-900 rounded-2xl flex items-center justify-center">
+                  {project.thumbnailUrl ? (
+                    <img
+                      src={project.thumbnailUrl}
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-slate-900 to-indigo-950 flex items-center justify-center p-4">
+                      <FolderGit2 className="w-10 h-10 text-indigo-400/60" />
+                    </div>
+                  )}
                   
                   {project.featured && (
                     <span className="absolute top-3 right-3 px-2.5 py-1 bg-amber-500 text-white text-[10px] font-extrabold tracking-wider uppercase rounded-full shadow-md flex items-center gap-1">

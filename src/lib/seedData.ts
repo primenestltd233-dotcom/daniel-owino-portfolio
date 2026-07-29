@@ -23,7 +23,7 @@ export const initialSiteSettings: SiteSettings = {
   fontFamily: 'Inter, sans-serif',
   footerText: 'Empowering innovation through software engineering, cloud solutions, and leadership.',
   copyrightText: '© 2026 Daniel Owino. All rights reserved.',
-  defaultProfileImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+  defaultProfileImage: '',
   seoDescription: 'Professional E-Portfolio and Technology Showcase of Daniel Owino - Software Engineer, Technology Specialist & Student Leader.',
   emailContact: 'danielowino233@gmail.com',
   phoneContact: '+254 700 000 000',
@@ -35,7 +35,7 @@ export const initialHero: HeroSection = {
   title: 'Software Engineer & Full-Stack Developer',
   shortIntro: 'Passionate about designing scalable cloud applications, building robust full-stack architectures, and leveraging modern software technologies to solve complex real-world problems.',
   tagline: 'Building the future with clean code, scalable architecture, and user-centric design.',
-  profileImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+  profileImageUrl: '',
   primaryButtonText: 'Explore Projects',
   primaryButtonLink: '#projects',
   secondaryButtonText: 'Download Resume',
@@ -82,7 +82,7 @@ Over the past years of intensive academic study, hands-on software development, 
     'Lead high-performing global engineering teams in developing transformative tech',
     'Contribute to open-source computing standards and digital infrastructure growth'
   ],
-  profileImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+  profileImageUrl: '',
 };
 
 export const initialEducation: EducationItem[] = [
