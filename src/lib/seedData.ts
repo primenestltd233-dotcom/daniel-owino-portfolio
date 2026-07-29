@@ -15,7 +15,7 @@ import {
 } from '../types';
 
 export const initialSiteSettings: SiteSettings = {
-  siteTitle: 'Daniel Owino | Professional E-Portfolio',
+  siteTitle: 'DANIEL OWINO EPORTFOLIO',
   logoText: 'DANIEL OWINO',
   primaryColor: '#2563eb',
   secondaryColor: '#0f172a',

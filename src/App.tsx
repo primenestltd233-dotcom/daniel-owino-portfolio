@@ -108,6 +108,11 @@ export default function App() {
   const [socials, setSocials] = useState<SocialLink[]>(() => loadCache<SocialLink[]>('socials') || initialSocials);
   const [media, setMedia] = useState<MediaItem[]>([]);
 
+  // Dynamic Document Title Sync
+  useEffect(() => {
+    document.title = settings.siteTitle || 'DANIEL OWINO EPORTFOLIO';
+  }, [settings.siteTitle]);
+
   // 1. Initialize Firestore Database Seed & Firebase Auth Listener
   useEffect(() => {
     ensureInitialSeed();
