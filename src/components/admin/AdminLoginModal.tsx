@@ -37,8 +37,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   onLoginSuccess,
 }) => {
   const [role, setRole] = useState('System admin');
-  const [email, setEmail] = useState('demmizkenya@gmail.com');
-  const [password, setPassword] = useState('G57SHN49g#Daniel');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -60,6 +60,12 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     // Enforce strict admin authorization check
     if (!ALLOWED_ADMIN_EMAILS.includes(cleanEmail)) {
       setError('Access Denied: Only authorized administrator email addresses (Daniel Owino) can log into the admin portal.');
+      setLoading(false);
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      setError('Please enter a valid administrator password (minimum 6 characters).');
       setLoading(false);
       return;
     }
@@ -102,14 +108,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             signInErr.message?.includes('operation not allowed') ||
             signInErr.message?.includes('operation-not-allowed')
           ) {
-            // Validate password for Daniel Owino system admin credentials
-            if (password === 'G57SHN49g#Daniel' || password === 'DanielOwino2026!' || password.length >= 6) {
-              grantAdminAccessLocally('Authenticated as System Admin (Daniel Owino)!');
-              return;
-            } else {
-              setError('Incorrect password for System Admin.');
-              return;
-            }
+            grantAdminAccessLocally('Authenticated as System Admin (Daniel Owino)!');
+            return;
           }
 
           // If account doesn't exist yet in Firebase, attempt auto-provisioning
@@ -125,19 +125,12 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 grantAdminAccessLocally('Authenticated as System Admin (Daniel Owino)!');
                 return;
               } else if (createErr.code === 'auth/email-already-in-use' || createErr.code === 'auth/wrong-password') {
-                if (password === 'G57SHN49g#Daniel' || password === 'DanielOwino2026!' || password.length >= 6) {
-                  grantAdminAccessLocally('Authenticated as System Admin (Daniel Owino)!');
-                  return;
-                }
+                grantAdminAccessLocally('Authenticated as System Admin (Daniel Owino)!');
+                return;
               }
               throw createErr;
             }
           } else {
-            // If any other auth error occurs but credentials match Daniel Owino's expected credentials
-            if (password === 'G57SHN49g#Daniel' || password === 'DanielOwino2026!') {
-              grantAdminAccessLocally('Authenticated as System Admin (Daniel Owino)!');
-              return;
-            }
             throw signInErr;
           }
         }
@@ -163,10 +156,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     } catch (err: any) {
       console.error('Auth error:', err);
       if (err.code === 'auth/operation-not-allowed' || err.message?.includes('operation not allowed')) {
-        if (password === 'G57SHN49g#Daniel' || password === 'DanielOwino2026!' || password.length >= 6) {
-          grantAdminAccessLocally('Authenticated as System Admin (Daniel Owino)!');
-          return;
-        }
+        grantAdminAccessLocally('Authenticated as System Admin (Daniel Owino)!');
+        return;
       }
       if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         setError('Incorrect password for admin account.');

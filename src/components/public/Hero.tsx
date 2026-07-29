@@ -34,16 +34,24 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Bento Grid Header */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="text-xs font-bold uppercase tracking-widest text-indigo-600">
               Interactive Suite & Portfolio
             </span>
           </div>
-          <span className="hidden sm:inline-block text-xs font-semibold text-slate-400">
-            Based in Nairobi • Open for Full-Stack & Engineering
-          </span>
+
+          {/* Requirement 8: "THE TECHNICAL COMPETENCIES" Animated Button */}
+          <button
+            onClick={() => onNavigate('skills')}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs uppercase tracking-wider rounded-full shadow-md shadow-indigo-600/20 transition-all transform hover:scale-105 animate-cta-pulse border border-indigo-400/40 cursor-pointer"
+            aria-label="Navigate to Technical Competencies"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-200" />
+            <span>THE TECHNICAL COMPETENCIES</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
 
         {/* Primary Bento Grid Layout */}
@@ -56,13 +64,29 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
 
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[11px] font-bold tracking-widest uppercase mb-4">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Senior Software Engineering</span>
+              {/* Requirement 3: Editable "SENIOR SOFTWARE ENGINEERING" (data.title) */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[11px] font-bold tracking-widest uppercase mb-4">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                <span>{data.title || 'Senior Software Engineering'}</span>
               </div>
 
+              {/* Requirement 6: Animated Wave Text for "DANIEL OWINO" */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] mb-4 tracking-tighter">
-                Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700">{data.fullName}</span>
+                Hi, I'm{' '}
+                <span className="inline-inline-flex flex-wrap text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700">
+                  {(data.fullName || 'DANIEL OWINO').split('').map((char, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-block animate-wave-letter hover:text-indigo-500 transition-colors"
+                      style={{ 
+                        animationDelay: `${idx * 0.08}s`,
+                        whiteSpace: char === ' ' ? 'pre' : 'normal'
+                      }}
+                    >
+                      {char}
+                    </span>
+                  ))}
+                </span>
               </h1>
 
               <p className="text-slate-600 text-base sm:text-lg max-w-xl leading-relaxed mb-6 font-normal">
@@ -76,12 +100,13 @@ export const Hero: React.FC<HeroProps> = ({
 
             {/* Action CTAs */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
+              {/* Requirement 7: Animated Pulsing "Explore Projects" CTA Button */}
               <button
                 onClick={() => onNavigate(data.primaryButtonLink?.replace('#', '') || 'projects')}
-                className="flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-full shadow-lg shadow-slate-900/15 transition-all transform hover:-translate-y-0.5"
+                className="flex items-center gap-2.5 px-6 py-3.5 bg-slate-900 hover:bg-indigo-600 text-white font-extrabold text-xs sm:text-sm rounded-full shadow-xl shadow-slate-900/20 transition-all duration-300 transform hover:-translate-y-0.5 animate-cta-pulse cursor-pointer border border-slate-800"
               >
-                <span>{data.primaryButtonText || 'View My Projects'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>{data.primaryButtonText || 'Explore Projects'}</span>
+                <ArrowRight className="w-4 h-4 text-indigo-400 group-hover:text-white" />
               </button>
 
               <button

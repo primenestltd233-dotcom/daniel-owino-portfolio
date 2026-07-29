@@ -1,13 +1,10 @@
 import React from 'react';
 import { 
   Heart, 
-  Linkedin, 
-  Github, 
-  Twitter, 
-  Mail,
   ArrowUp
 } from 'lucide-react';
 import { SiteSettings, SocialLink } from '../types';
+import { SocialIcon } from './common/SocialIcon';
 
 interface FooterProps {
   settings: SiteSettings;
@@ -18,16 +15,6 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ settings, socials, onNavigate }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const getSocialIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'linkedin': return <Linkedin className="w-4 h-4" />;
-      case 'github': return <Github className="w-4 h-4" />;
-      case 'twitter':
-      case 'x/twitter': return <Twitter className="w-4 h-4" />;
-      default: return <Mail className="w-4 h-4" />;
-    }
   };
 
   return (
@@ -69,17 +56,18 @@ export const Footer: React.FC<FooterProps> = ({ settings, socials, onNavigate })
           {/* Social Links */}
           <div className="md:col-span-3 space-y-3">
             <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-300">Connect Online</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5">
               {socials.filter(s => s.published).map((soc) => (
                 <a
                   key={soc.id}
                   href={soc.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-2xl transition-all border border-slate-700/50"
+                  aria-label={soc.platform}
+                  className="p-3 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-2xl transition-all duration-200 border border-slate-700/60 transform hover:scale-110 shadow-sm"
                   title={soc.platform}
                 >
-                  {getSocialIcon(soc.platform)}
+                  <SocialIcon platform={soc.platform} className="w-4 h-4" />
                 </a>
               ))}
             </div>

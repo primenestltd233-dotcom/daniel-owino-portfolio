@@ -6,13 +6,11 @@ import {
   Send, 
   CheckCircle2, 
   AlertCircle,
-  Linkedin,
-  Github,
-  Twitter,
   MessageSquare
 } from 'lucide-react';
 import { sendContactMessage } from '../../lib/portfolioService';
 import { SocialLink, SiteSettings } from '../../types';
+import { SocialIcon } from '../common/SocialIcon';
 
 interface ContactProps {
   settings: SiteSettings;
@@ -53,16 +51,6 @@ export const Contact: React.FC<ContactProps> = ({ settings, socials }) => {
       setError(err?.message || 'Failed to send message. Please try again.');
     } finally {
       setSending(false);
-    }
-  };
-
-  const getSocialIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'linkedin': return <Linkedin className="w-5 h-5" />;
-      case 'github': return <Github className="w-5 h-5" />;
-      case 'twitter':
-      case 'x/twitter': return <Twitter className="w-5 h-5" />;
-      default: return <Mail className="w-5 h-5" />;
     }
   };
 
@@ -137,17 +125,18 @@ export const Contact: React.FC<ContactProps> = ({ settings, socials }) => {
             {/* Social Links */}
             <div className="pt-6 border-t border-slate-800 space-y-3">
               <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Connect Online</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {socials.filter(s => s.published).map((soc) => (
                   <a
                     key={soc.id}
                     href={soc.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-2xl transition-all border border-slate-700/50"
+                    aria-label={soc.platform}
+                    className="p-3 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-2xl transition-all duration-200 border border-slate-700/60 transform hover:scale-110 shadow-sm"
                     title={soc.platform}
                   >
-                    {getSocialIcon(soc.platform)}
+                    <SocialIcon platform={soc.platform} className="w-5 h-5" />
                   </a>
                 ))}
               </div>

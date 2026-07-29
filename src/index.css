@@ -1,1 +1,58 @@
 @import "tailwindcss";
+
+@layer utilities {
+  /* Wave text animation */
+  @keyframes waveText {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  /* Rapid pulsing animation for WhatsApp */
+  @keyframes rapidPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+    }
+    50% {
+      transform: scale(1.06);
+      box-shadow: 0 0 0 12px rgba(37, 211, 102, 0);
+    }
+  }
+
+  /* Subtle pulsing animation for CTAs */
+  @keyframes subtlePulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.5);
+    }
+    50% {
+      transform: scale(1.03);
+      box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+    }
+  }
+
+  .animate-wave-letter {
+    animation: waveText 2.5s ease-in-out infinite;
+  }
+
+  .animate-whatsapp-pulse {
+    animation: rapidPulse 1.8s ease-in-out infinite;
+  }
+
+  .animate-cta-pulse {
+    animation: subtlePulse 2.2s ease-in-out infinite;
+  }
+}
+
+/* Accessibility: respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-wave-letter,
+  .animate-whatsapp-pulse,
+  .animate-cta-pulse {
+    animation: none !important;
+  }
+}

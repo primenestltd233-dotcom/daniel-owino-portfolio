@@ -13,6 +13,7 @@ import { CVResume } from './components/public/CVResume';
 import { BlogView } from './components/public/BlogView';
 import { Contact } from './components/public/Contact';
 import { Footer } from './components/Footer';
+import { FloatingButtons } from './components/public/FloatingButtons';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 
@@ -266,6 +267,11 @@ export default function App() {
         socials={socials}
         onNavigate={handleNavigate}
       />
+
+      {/* Requirement 4 & 9: Floating Hire Me (Bottom-Left) & WhatsApp (Bottom-Right) Buttons */}
+      {!isAdminDashboardOpen && (
+        <FloatingButtons phone={settings.phoneContact} email="danielowino233@gmail.com" />
+      )}
 
       {/* Admin Login Modal */}
       <AdminLoginModal
