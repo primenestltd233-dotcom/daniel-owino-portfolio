@@ -23,6 +23,15 @@ export const Skills: React.FC<SkillsProps> = ({ items }) => {
     ? publishedSkills 
     : publishedSkills.filter(s => s.category === selectedCategory);
 
+  const getLevelPercentage = (level: SkillLevel): number => {
+    switch (level) {
+      case 'Proficient': return 95;
+      case 'Advanced': return 85;
+      case 'Intermediate': return 70;
+      default: return 50;
+    }
+  };
+
   const getLevelBadge = (level: SkillLevel) => {
     switch (level) {
       case 'Proficient':
@@ -55,7 +64,7 @@ export const Skills: React.FC<SkillsProps> = ({ items }) => {
             Engineering & Technical Skills
           </h2>
           <p className="text-slate-600 text-base">
-            Verified expertise across programming languages, web frameworks, cloud architecture, databases, and professional practices.
+            Categorized expertise across web development, cloud architecture, database management, networking, UI/UX, and graphic design with verified proficiency indicators.
           </p>
         </div>
 
@@ -71,7 +80,7 @@ export const Skills: React.FC<SkillsProps> = ({ items }) => {
                   : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
-              {cat === 'ALL' ? 'All Skills' : cat}
+              {cat === 'ALL' ? 'All Competencies' : cat}
             </button>
           ))}
         </div>
@@ -83,37 +92,51 @@ export const Skills: React.FC<SkillsProps> = ({ items }) => {
               No skills listed for this category.
             </div>
           ) : (
-            filteredSkills.map((skill, idx) => (
-              <div 
-                key={skill.id || idx}
-                className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group space-y-3 flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className={`w-3 h-3 rounded-full ${getDotColor(idx)} shrink-0`}></span>
-                      <h3 className="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">
-                        {skill.name}
-                      </h3>
+            filteredSkills.map((skill, idx) => {
+              const pct = getLevelPercentage(skill.level);
+              return (
+                <div 
+                  key={skill.id || idx}
+                  className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group space-y-4 flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className={`w-3 h-3 rounded-full ${getDotColor(idx)} shrink-0`}></span>
+                        <h3 className="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">
+                          {skill.name}
+                        </h3>
+                      </div>
+                      <span className="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
+                        {pct}%
+                      </span>
+                    </div>
+
+                    {/* Progress Indicator Bar */}
+                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-indigo-500 to-blue-600 rounded-full transition-all duration-700"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+                      <span className="font-medium">Category</span>
+                      <span className="font-bold text-slate-700 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">{skill.category}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="font-medium">Category</span>
-                    <span className="font-bold text-slate-700 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">{skill.category}</span>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    {skill.yearsOfExperience ? (
+                      <span className="text-[11px] font-medium text-slate-400">
+                        {skill.yearsOfExperience} {skill.yearsOfExperience === 1 ? 'yr exp' : 'yrs exp'}
+                      </span>
+                    ) : <span />}
+                    {getLevelBadge(skill.level)}
                   </div>
                 </div>
-
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  {skill.yearsOfExperience ? (
-                    <span className="text-[11px] font-medium text-slate-400">
-                      {skill.yearsOfExperience} {skill.yearsOfExperience === 1 ? 'yr exp' : 'yrs exp'}
-                    </span>
-                  ) : <span />}
-                  {getLevelBadge(skill.level)}
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

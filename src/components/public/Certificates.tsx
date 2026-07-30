@@ -7,7 +7,8 @@ import {
   X, 
   Eye, 
   ShieldCheck,
-  FileText
+  FileText,
+  Download
 } from 'lucide-react';
 import { CertificateItem } from '../../types';
 
@@ -33,7 +34,7 @@ export const Certificates: React.FC<CertificatesProps> = ({ items }) => {
             Certifications & Technical Credentials
           </h2>
           <p className="text-slate-600 text-base">
-            Professional industry certifications, cloud architecture accreditations, and engineering training.
+            Professional industry certifications, cloud architecture accreditations, and verified engineering credentials.
           </p>
         </div>
 
@@ -44,68 +45,101 @@ export const Certificates: React.FC<CertificatesProps> = ({ items }) => {
               No certificates published yet.
             </div>
           ) : (
-            publishedItems.map((cert) => (
-              <div 
-                key={cert.id}
-                className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all flex flex-col justify-between space-y-4 group"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                      <Award className="w-5 h-5" />
+            publishedItems.map((cert) => {
+              const displayImg = cert.imageUrl || (cert.certificateFileUrl && !cert.certificateFileUrl.endsWith('.pdf') ? cert.certificateFileUrl : null);
+              return (
+                <div 
+                  key={cert.id}
+                  className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all flex flex-col justify-between space-y-4 group overflow-hidden"
+                >
+                  <div className="space-y-3">
+                    {/* Optional Thumbnail Image */}
+                    {displayImg ? (
+                      <div className="relative h-40 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80">
+                        <img
+                          src={displayImg}
+                          alt={cert.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          decoding="async"
+                          referrerPolicy="no-referrer"
+                        />
+                        <span className="absolute top-2.5 right-2.5 px-2.5 py-1 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-extrabold uppercase tracking-wider rounded-full">
+                          {cert.category}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                          <Award className="w-5 h-5" />
+                        </div>
+                        <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-extrabold uppercase tracking-wider rounded-full border border-indigo-100">
+                          {cert.category}
+                        </span>
+                      </div>
+                    )}
+
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">{cert.title}</h3>
+                      <p className="text-xs font-semibold text-indigo-600">{cert.issuingOrganization}</p>
                     </div>
-                    <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-extrabold uppercase tracking-wider rounded-full border border-indigo-100">
-                      {cert.category}
-                    </span>
+
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                      {cert.description}
+                    </p>
+
+                    {/* Skills Acquired */}
+                    {cert.skillsAcquired && cert.skillsAcquired.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {cert.skillsAcquired.map((skill, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-semibold rounded-md border border-slate-200">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">{cert.title}</h3>
-                    <p className="text-xs font-semibold text-indigo-600">{cert.issuingOrganization}</p>
-                  </div>
-
-                  <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
-                    {cert.description}
-                  </p>
-                </div>
-
-                <div className="space-y-3 pt-3 border-t border-slate-100">
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      Issued: {cert.issueDate}
-                    </span>
-                    {cert.credentialId && (
-                      <span className="font-mono text-[10px] bg-slate-100 px-2 py-0.5 rounded-full text-slate-700 font-semibold">
-                        ID: {cert.credentialId}
+                  <div className="space-y-3 pt-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        Issued: {cert.issueDate}
                       </span>
-                    )}
-                  </div>
+                      {cert.credentialId && (
+                        <span className="font-mono text-[10px] bg-slate-100 px-2 py-0.5 rounded-full text-slate-700 font-semibold">
+                          ID: {cert.credentialId}
+                        </span>
+                      )}
+                    </div>
 
-                  <div className="flex items-center justify-between gap-2 pt-1">
-                    <button
-                      onClick={() => setSelectedCert(cert)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-full transition-colors border border-indigo-100"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      View Certificate
-                    </button>
-
-                    {cert.verificationUrl && (
-                      <a
-                        href={cert.verificationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-xs text-slate-500 hover:text-indigo-600 font-semibold"
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <button
+                        onClick={() => setSelectedCert(cert)}
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-full transition-colors border border-indigo-100 cursor-pointer"
                       >
-                        Verify <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
-                  </div>
-                </div>
+                        <Eye className="w-3.5 h-3.5" />
+                        View Certificate
+                      </button>
 
-              </div>
-            ))
+                      {(cert.downloadUrl || cert.certificateFileUrl) && (
+                        <a
+                          href={cert.downloadUrl || cert.certificateFileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-full transition-colors"
+                        >
+                          <Download className="w-3.5 h-3.5 text-indigo-400" />
+                          Download
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                </div>
+              );
+            })
           )}
         </div>
 
@@ -144,11 +178,13 @@ export const Certificates: React.FC<CertificatesProps> = ({ items }) => {
                     Open PDF Document <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-              ) : selectedCert.certificateFileUrl ? (
+              ) : (selectedCert.imageUrl || selectedCert.certificateFileUrl) ? (
                 <img
-                  src={selectedCert.certificateFileUrl}
+                  src={selectedCert.imageUrl || selectedCert.certificateFileUrl}
                   alt={selectedCert.title}
                   className="w-full max-h-[400px] object-contain"
+                  loading="lazy"
+                  decoding="async"
                   referrerPolicy="no-referrer"
                 />
               ) : (
@@ -160,14 +196,14 @@ export const Certificates: React.FC<CertificatesProps> = ({ items }) => {
 
             <div className="flex items-center justify-between text-xs text-slate-600 pt-2 border-t border-slate-100">
               <span>Credential ID: <strong className="text-slate-800">{selectedCert.credentialId || 'N/A'}</strong></span>
-              {selectedCert.credentialUrl && (
+              {(selectedCert.verificationUrl || selectedCert.credentialUrl) && (
                 <a
-                  href={selectedCert.credentialUrl}
+                  href={selectedCert.verificationUrl || selectedCert.credentialUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-indigo-600 hover:underline font-bold flex items-center gap-1"
                 >
-                  Official Record Link <ExternalLink className="w-3 h-3" />
+                  Verify Official Record <ExternalLink className="w-3 h-3" />
                 </a>
               )}
             </div>

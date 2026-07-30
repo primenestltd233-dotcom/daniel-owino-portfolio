@@ -12,6 +12,8 @@ import { Leadership } from './components/public/Leadership';
 import { CVResume } from './components/public/CVResume';
 import { BlogView } from './components/public/BlogView';
 import { FreelanceServices } from './components/public/FreelanceServices';
+import { StatsCounters } from './components/public/StatsCounters';
+import { Testimonials } from './components/public/Testimonials';
 import { Contact } from './components/public/Contact';
 import { Footer } from './components/Footer';
 import { FloatingButtons } from './components/public/FloatingButtons';
@@ -42,7 +44,8 @@ import {
   subscribeMessages, 
   subscribeSocials, 
   subscribeMedia,
-  subscribeFreelanceServices
+  subscribeFreelanceServices,
+  subscribeTestimonials
 } from './lib/portfolioService';
 
 import { 
@@ -61,7 +64,8 @@ import {
   SocialLink, 
   SiteSettings, 
   MediaItem,
-  FreelanceServicesSection
+  FreelanceServicesSection,
+  TestimonialItem
 } from './types';
 import { 
   initialHero, 
@@ -77,7 +81,8 @@ import {
   initialBlogPosts, 
   initialSocials, 
   initialSiteSettings,
-  initialFreelanceServices
+  initialFreelanceServices,
+  initialTestimonials
 } from './lib/seedData';
 
 export default function App() {
@@ -112,6 +117,7 @@ export default function App() {
   const [socials, setSocials] = useState<SocialLink[]>(() => loadCache<SocialLink[]>('socials') || initialSocials);
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [freelanceServices, setFreelanceServices] = useState<FreelanceServicesSection>(() => loadCache<FreelanceServicesSection>('freelanceServices') || initialFreelanceServices);
+  const [testimonials, setTestimonials] = useState<TestimonialItem[]>(() => loadCache<TestimonialItem[]>('testimonials') || initialTestimonials);
 
   // Dynamic Document Title Sync
   useEffect(() => {
@@ -159,6 +165,7 @@ export default function App() {
     const unsubSocials = subscribeSocials(setSocials);
     const unsubMedia = subscribeMedia(setMedia);
     const unsubFreelanceServices = subscribeFreelanceServices(setFreelanceServices);
+    const unsubTestimonials = subscribeTestimonials(setTestimonials);
 
     return () => {
       unsubSettings();
@@ -177,6 +184,7 @@ export default function App() {
       unsubSocials();
       unsubMedia();
       unsubFreelanceServices();
+      unsubTestimonials();
     };
   }, []);
 
@@ -240,6 +248,15 @@ export default function App() {
           onNavigate={handleNavigate}
         />
 
+        {/* 1.5 STATS COUNTERS */}
+        <StatsCounters
+          totalProjects={projects.filter(p => p.published).length}
+          totalCertificates={certificates.filter(c => c.published).length}
+          yearsOfExperience={yearsExp}
+          clientsServed={14}
+          technologiesCount={skills.filter(s => s.published).length || 24}
+        />
+
         {/* 2. ABOUT ME */}
         <About data={about} />
 
@@ -257,6 +274,9 @@ export default function App() {
 
         {/* 7. CERTIFICATES & TRAINING */}
         <Certificates items={certificates} />
+
+        {/* 7.5 TESTIMONIALS & ENDORSEMENTS */}
+        <Testimonials items={testimonials} />
 
         {/* 8. ACHIEVEMENTS */}
         <Achievements items={achievements} />

@@ -12,7 +12,8 @@ import {
   BlogPost, 
   SocialLink, 
   SiteSettings,
-  FreelanceServicesSection
+  FreelanceServicesSection,
+  TestimonialItem
 } from '../types';
 
 export const initialSiteSettings: SiteSettings = {
@@ -33,57 +34,59 @@ export const initialSiteSettings: SiteSettings = {
 
 export const initialHero: HeroSection = {
   fullName: 'DANIEL OWINO',
-  title: 'Software Engineer & Full-Stack Developer',
-  shortIntro: 'Passionate about designing scalable cloud applications, building robust full-stack architectures, and leveraging modern software technologies to solve complex real-world problems.',
-  tagline: 'Building the future with clean code, scalable architecture, and user-centric design.',
-  profileImageUrl: '',
-  primaryButtonText: 'Explore Projects',
+  title: 'Software Engineer | Full Stack Web Developer | Technology Specialist | UI/UX Designer | Graphics Designer | Computer Networking & IT Support',
+  shortIntro: 'I design and build modern, responsive, high-performance digital solutions that help businesses and organizations solve real-world challenges.',
+  tagline: 'Crafting clean code, scalable architecture, and intuitive user experiences.',
+  profileImageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+  primaryButtonText: 'View Projects',
   primaryButtonLink: '#projects',
-  secondaryButtonText: 'Download Resume',
+  secondaryButtonText: 'Download CV',
   secondaryButtonLink: '#resume',
   contactButtonText: 'Contact Me',
   contactButtonLink: '#contact',
 };
 
 export const initialAbout: AboutSection = {
-  biography: `I am Daniel Owino, a dedicated Software Engineer and Technology Consultant with a strong foundation in computer science, cloud computing, and full-stack software development. Driven by curiosity and a desire for continuous learning, I specialize in building reliable, high-performance web applications, cloud-native services, and user-focused digital solutions.
+  biography: `I am Daniel Owino, a Senior Software Engineer, Technology Specialist, UI/UX Designer, and Technology Leader with a robust background in full-stack web engineering, cloud infrastructure, computer networking, and graphic design.
 
-Over the past years of intensive academic study, hands-on software development, and community leadership, I have acquired expertise in modern web frameworks, database administration, RESTful API design, and cloud architecture. I thrive in collaborative environments where software craftsmanship, clean code principles, and problem-solving drive product excellence.`,
-  personalIntro: 'Motivated tech enthusiast and developer committed to turning visionary concepts into elegant, functional digital applications.',
-  mission: 'To architect clean, scalable, and impactful technology solutions that empower organizations, optimize workflows, and enhance human experiences.',
-  vision: 'To become a distinguished global software leader and technology innovator driving digital transformation across Africa and worldwide.',
+My engineering journey is driven by a profound passion for technological innovation and digital transformation. With deep expertise across modern JavaScript/TypeScript ecosystems, backend REST/GraphQL microservices, cloud platforms (GCP, AWS), and network infrastructure, I specialize in engineering high-availability, responsive, and secure software applications.
+
+Beyond writing production-ready code, I am an advocate for clean architecture, user-centered design principles, and collaborative student and community leadership. Whether architecting enterprise databases, optimizing client-side performance, designing high-conversion visual assets, or configuring resilient network environments, my objective is to deliver digital solutions that drive tangible business value and leave a lasting impression.`,
+  personalIntro: 'Senior Software Engineer & Technology Specialist dedicated to engineering scalable digital solutions, elegant interfaces, and resilient infrastructure.',
+  mission: 'To architect clean, scalable, high-performance, and accessible digital products that empower businesses, solve complex challenges, and elevate user experiences.',
+  vision: 'To be a pioneering technology architect and engineering leader driving digital transformation, cloud innovation, and software mastery globally.',
   careerInterests: [
-    'Full-Stack Web & Mobile Development',
-    'Cloud Systems Architecture & DevOps',
-    'Enterprise Data Engineering & APIs',
-    'Artificial Intelligence & Applied Machine Learning',
-    'Cybersecurity & Network Infrastructure'
+    'Full-Stack Web & Enterprise Application Engineering',
+    'Cloud Systems Architecture, DevOps & Automation',
+    'UI/UX Design & High-Fidelity Design Systems',
+    'Computer Networking, System Administration & IT Security',
+    'Graphic Design, Brand Identity & Digital Media'
   ],
   specializations: [
-    'Frontend Engineering (React, TypeScript, Tailwind CSS)',
-    'Backend Development (Node.js, Express, REST APIs)',
-    'Database Architecture (PostgreSQL, Firestore, MongoDB)',
-    'Cloud Infrastructure (Google Cloud Platform, AWS, Docker)',
-    'System Design & Security Best Practices'
+    'Full-Stack Development (React, Next.js, TypeScript, Node.js, Express)',
+    'Cloud Platforms & DevOps (Google Cloud, Firebase, Docker, CI/CD)',
+    'Database Engineering (Firestore, PostgreSQL, Drizzle ORM, MongoDB)',
+    'UI/UX & Graphics (Figma, Responsive Design Systems, Canva, Photoshop)',
+    'Computer Networks & IT Support (Routing, Switching, Hardware Diagnostics)'
   ],
   values: [
-    'Technical Excellence & Code Craftsmanship',
-    'Integrity & Professional Reliability',
-    'Continuous Learning & Adaptability',
-    'Collaborative Leadership & Mentorship',
-    'User-Centered Problem Solving'
+    'Engineering Excellence & Clean Architecture',
+    'Uncompromising Code Quality & Performance',
+    'User-Centric Design & Digital Accessibility',
+    'Continuous Innovation & Skill Mastery',
+    'Collaborative Leadership & Knowledge Sharing'
   ],
   shortTermGoals: [
-    'Attain advanced Cloud Architect and Full-Stack Certifications',
-    'Deploy high-impact open-source and enterprise software systems',
-    'Expand mentorship initiatives for emerging software developer communities'
+    'Expand enterprise software consulting and cloud infrastructure deployments',
+    'Attain advanced Senior Cloud Architect & Security certifications',
+    'Mentor emerging developers in full-stack software development and UI/UX design'
   ],
   longTermGoals: [
-    'Found a cutting-edge technology enterprise focused on scalable cloud solutions',
-    'Lead high-performing global engineering teams in developing transformative tech',
-    'Contribute to open-source computing standards and digital infrastructure growth'
+    'Establish a premier software engineering consultancy and technological innovation hub',
+    'Lead enterprise-grade digital infrastructure initiatives across global markets',
+    'Pioneer open-source developer tools and scalable cloud-native frameworks'
   ],
-  profileImageUrl: '',
+  profileImageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
 };
 
 export const initialEducation: EducationItem[] = [
@@ -629,3 +632,39 @@ export const initialFreelanceServices: FreelanceServicesSection = {
   location: "Kisumu, Kenya",
   whatsappLink: "https://wa.me/254708083643",
 };
+
+export const initialTestimonials: TestimonialItem[] = [
+  {
+    id: 'test-1',
+    quote: "Daniel did an amazing job on both my design and website — I honestly didn't expect it to turn out this good. Everything looks clean, modern, and very professional, and he really paid attention to the small details that make a big difference. He was easy to work with, understood exactly what I wanted, and delivered beyond my expectations.",
+    name: "Pauline Ruth",
+    role: "Maseno University Student",
+    company: "Maseno University",
+    rating: 5,
+    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+    published: true,
+    order: 1,
+  },
+  {
+    id: 'test-2',
+    quote: "Daniel did an excellent job on my design — the final result was clean, modern, and very professional. He really understood my vision and brought it to life with great attention to detail. The whole process was smooth, and the quality of his work truly stands out.",
+    name: "Mary Kodonyo",
+    role: "Digital Specialist",
+    company: "Digital Marketing Narok",
+    rating: 5,
+    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
+    published: true,
+    order: 2,
+  },
+  {
+    id: 'test-3',
+    quote: "Working with Daniel Owino on our enterprise cloud asset management solution was a game-changer. His full-stack engineering skills, architectural clarity, and dedication to code quality ensured our system launched on time and scaled effortlessly.",
+    name: "Dr. James Ochieng",
+    role: "Department Lead & Technology Mentor",
+    company: "School of Computing",
+    rating: 5,
+    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
+    published: true,
+    order: 3,
+  }
+];

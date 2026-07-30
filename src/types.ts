@@ -72,6 +72,8 @@ export interface ProjectItem {
   galleryImages: string[];
   problemStatement?: string;
   solution?: string;
+  objectives?: string;
+  developmentProcess?: string;
   keyFeatures: string[];
   myRole?: string;
   challenges?: string;
@@ -81,6 +83,7 @@ export interface ProjectItem {
   videoUrl?: string;
   startDate?: string;
   completionDate?: string;
+  status?: string; // e.g. 'Completed' | 'In Progress' | 'Production Live'
   featured: boolean;
   published: boolean;
   order: number;
@@ -116,7 +119,22 @@ export interface CertificateItem {
   certificateFileUrl: string;
   verificationUrl?: string;
   category: string;
+  skillsAcquired?: string[];
+  imageUrl?: string;
+  downloadUrl?: string;
   featured: boolean;
+  published: boolean;
+  order: number;
+}
+
+export interface TestimonialItem {
+  id: string;
+  name: string;
+  role: string;
+  company?: string;
+  quote: string;
+  avatarUrl?: string;
+  rating?: number;
   published: boolean;
   order: number;
 }

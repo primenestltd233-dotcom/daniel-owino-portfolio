@@ -26,7 +26,8 @@ import {
   SocialLink, 
   SiteSettings,
   MediaItem,
-  FreelanceServicesSection
+  FreelanceServicesSection,
+  TestimonialItem
 } from '../types';
 import { 
   initialHero, 
@@ -42,7 +43,8 @@ import {
   initialBlogPosts, 
   initialSocials, 
   initialSiteSettings,
-  initialFreelanceServices
+  initialFreelanceServices,
+  initialTestimonials
 } from './seedData';
 
 // Helper function to strip `undefined` fields recursively before saving to Firestore
@@ -909,5 +911,49 @@ export async function deleteMediaItem(id: string) {
     await deleteDoc(doc(db, 'media', id));
   } catch (err: any) {
     console.warn('deleteMediaItem notice:', err?.message);
+  }
+}
+
+// 16. Testimonials Management
+export function subscribeTestimonials(callback: (items: TestimonialItem[]) => void) {
+  const colRef = collection(db, 'testimonials');
+  return onSnapshot(colRef, (snap) => {
+    const items: TestimonialItem[] = [];
+    snap.forEach((docSnap) => {
+      items.push({ id: docSnap.id, ...docSnap.data() } as TestimonialItem);
+    });
+    items.sort((a, b) => (a.order || 0) - (b.order || 0));
+    saveCache('testimonials', items);
+    callback(items);
+  }, (err) => {
+    console.warn('subscribeTestimonials notice (using fallback):', err?.message);
+    const fallback = loadCache<TestimonialItem[]>('testimonials');
+    callback(fallback !== null ? fallback : initialTestimonials);
+  });
+}
+
+export async function saveTestimonialItem(item: TestimonialItem) {
+  const id = item.id || `test_${Date.now()}`;
+  const cleanItem = sanitizeForFirestore({ ...item, id });
+  const cached = loadCache<TestimonialItem[]>('testimonials') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('testimonials', updated);
+  try {
+    await setDoc(doc(db, 'testimonials', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveTestimonialItem Firestore write notice:', err?.message);
+  }
+}
+
+export async function deleteTestimonialItem(id: string) {
+  const cached = loadCache<TestimonialItem[]>('testimonials') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('testimonials', updated);
+  try {
+    await deleteDoc(doc(db, 'testimonials', id));
+  } catch (err: any) {
+    console.warn('deleteTestimonialItem Firestore delete notice:', err?.message);
   }
 }
