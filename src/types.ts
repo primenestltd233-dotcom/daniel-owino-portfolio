@@ -235,6 +235,7 @@ export interface ServiceItem {
   iconName: string;
   label: string;
   order: number;
+  imageUrl?: string;
 }
 
 export interface StatItem {

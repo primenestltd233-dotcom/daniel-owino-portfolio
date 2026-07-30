@@ -161,12 +161,40 @@ export const FreelanceServices: React.FC<FreelanceServicesProps> = ({ data, onSe
             {data.services?.map((service) => (
               <div 
                 key={service.id}
-                className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-md transition-all hover:border-indigo-300 group flex flex-col justify-between"
+                className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-all hover:border-indigo-300 group flex flex-col justify-between overflow-hidden"
               >
                 <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                    {renderIcon(service.iconName)}
+                  {/* Service Custom Image Container */}
+                  <div className="relative w-full h-44 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shadow-2xs">
+                    {service.imageUrl ? (
+                      <img
+                        src={service.imageUrl}
+                        alt={service.label}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          // Fallback gracefully if image fails to load
+                          (e.target as HTMLElement).style.display = 'none';
+                          const fallbackParent = (e.target as HTMLElement).parentElement;
+                          if (fallbackParent) {
+                            fallbackParent.classList.add('flex', 'items-center', 'justify-center', 'bg-indigo-50/70');
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-indigo-50 via-slate-50 to-indigo-100/40 flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-white shadow-xs text-indigo-600 flex items-center justify-center">
+                          {renderIcon(service.iconName, 'w-6 h-6')}
+                        </div>
+                      </div>
+                    )}
+                    {/* Floating Icon Badge */}
+                    <div className="absolute top-2.5 right-2.5 w-9 h-9 rounded-lg bg-white/95 backdrop-blur-xs text-indigo-600 shadow-sm flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                      {renderIcon(service.iconName, 'w-4 h-4')}
+                    </div>
                   </div>
+
                   <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
                     {service.label}
                   </h4>
