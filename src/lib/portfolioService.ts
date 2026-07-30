@@ -67,13 +67,29 @@ export function sanitizeForFirestore<T>(data: T): T {
   return data;
 }
 
+export function cleanUnsplashInObject<T>(data: T): T {
+  if (!data) return data;
+  try {
+    const jsonStr = JSON.stringify(data);
+    if (jsonStr.includes('images.unsplash.com') || jsonStr.includes('unsplash')) {
+      const cleanedStr = jsonStr.replace(/https:\/\/images\.unsplash\.com\/[^\s"']+/g, '');
+      return JSON.parse(cleanedStr);
+    }
+  } catch {
+    // Return data as-is if stringify/parse fails
+  }
+  return data;
+}
+
 // Storage keys for offline or quick fallback caching
 const CACHE_KEY = 'daniel_owino_portfolio_cache_v2';
 
 export function loadCache<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(`${CACHE_KEY}_${key}`);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return cleanUnsplashInObject(parsed);
   } catch {
     return null;
   }
