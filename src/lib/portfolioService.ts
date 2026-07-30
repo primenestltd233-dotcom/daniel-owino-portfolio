@@ -26,8 +26,7 @@ import {
   SocialLink, 
   SiteSettings,
   MediaItem,
-  FreelanceServicesSection,
-  TestimonialItem
+  FreelanceServicesSection
 } from '../types';
 import { 
   initialHero, 
@@ -43,8 +42,7 @@ import {
   initialBlogPosts, 
   initialSocials, 
   initialSiteSettings,
-  initialFreelanceServices,
-  initialTestimonials
+  initialFreelanceServices
 } from './seedData';
 
 // Helper function to strip `undefined` fields recursively before saving to Firestore
@@ -67,29 +65,13 @@ export function sanitizeForFirestore<T>(data: T): T {
   return data;
 }
 
-export function cleanUnsplashInObject<T>(data: T): T {
-  if (!data) return data;
-  try {
-    const jsonStr = JSON.stringify(data);
-    if (jsonStr.includes('images.unsplash.com') || jsonStr.includes('unsplash')) {
-      const cleanedStr = jsonStr.replace(/https:\/\/images\.unsplash\.com\/[^\s"']+/g, '');
-      return JSON.parse(cleanedStr);
-    }
-  } catch {
-    // Return data as-is if stringify/parse fails
-  }
-  return data;
-}
-
 // Storage keys for offline or quick fallback caching
 const CACHE_KEY = 'daniel_owino_portfolio_cache_v2';
 
 export function loadCache<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(`${CACHE_KEY}_${key}`);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return cleanUnsplashInObject(parsed);
+    return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
@@ -927,49 +909,5 @@ export async function deleteMediaItem(id: string) {
     await deleteDoc(doc(db, 'media', id));
   } catch (err: any) {
     console.warn('deleteMediaItem notice:', err?.message);
-  }
-}
-
-// 16. Testimonials Management
-export function subscribeTestimonials(callback: (items: TestimonialItem[]) => void) {
-  const colRef = collection(db, 'testimonials');
-  return onSnapshot(colRef, (snap) => {
-    const items: TestimonialItem[] = [];
-    snap.forEach((docSnap) => {
-      items.push({ id: docSnap.id, ...docSnap.data() } as TestimonialItem);
-    });
-    items.sort((a, b) => (a.order || 0) - (b.order || 0));
-    saveCache('testimonials', items);
-    callback(items);
-  }, (err) => {
-    console.warn('subscribeTestimonials notice (using fallback):', err?.message);
-    const fallback = loadCache<TestimonialItem[]>('testimonials');
-    callback(fallback !== null ? fallback : initialTestimonials);
-  });
-}
-
-export async function saveTestimonialItem(item: TestimonialItem) {
-  const id = item.id || `test_${Date.now()}`;
-  const cleanItem = sanitizeForFirestore({ ...item, id });
-  const cached = loadCache<TestimonialItem[]>('testimonials') || [];
-  const index = cached.findIndex(i => i.id === id);
-  const updated = [...cached];
-  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
-  saveCache('testimonials', updated);
-  try {
-    await setDoc(doc(db, 'testimonials', id), cleanItem, { merge: true });
-  } catch (err: any) {
-    console.warn('saveTestimonialItem Firestore write notice:', err?.message);
-  }
-}
-
-export async function deleteTestimonialItem(id: string) {
-  const cached = loadCache<TestimonialItem[]>('testimonials') || [];
-  const updated = cached.filter(i => i.id !== id);
-  saveCache('testimonials', updated);
-  try {
-    await deleteDoc(doc(db, 'testimonials', id));
-  } catch (err: any) {
-    console.warn('deleteTestimonialItem Firestore delete notice:', err?.message);
   }
 }

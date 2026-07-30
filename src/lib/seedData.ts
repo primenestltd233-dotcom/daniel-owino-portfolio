@@ -12,8 +12,7 @@ import {
   BlogPost, 
   SocialLink, 
   SiteSettings,
-  FreelanceServicesSection,
-  TestimonialItem
+  FreelanceServicesSection
 } from '../types';
 
 export const initialSiteSettings: SiteSettings = {
@@ -34,57 +33,55 @@ export const initialSiteSettings: SiteSettings = {
 
 export const initialHero: HeroSection = {
   fullName: 'DANIEL OWINO',
-  title: 'Software Engineer | Full Stack Web Developer | Technology Specialist | UI/UX Designer | Graphics Designer | Computer Networking & IT Support',
-  shortIntro: 'I design and build modern, responsive, high-performance digital solutions that help businesses and organizations solve real-world challenges.',
-  tagline: 'Crafting clean code, scalable architecture, and intuitive user experiences.',
+  title: 'Software Engineer & Full-Stack Developer',
+  shortIntro: 'Passionate about designing scalable cloud applications, building robust full-stack architectures, and leveraging modern software technologies to solve complex real-world problems.',
+  tagline: 'Building the future with clean code, scalable architecture, and user-centric design.',
   profileImageUrl: '',
-  primaryButtonText: 'View Projects',
+  primaryButtonText: 'Explore Projects',
   primaryButtonLink: '#projects',
-  secondaryButtonText: 'Download CV',
+  secondaryButtonText: 'Download Resume',
   secondaryButtonLink: '#resume',
   contactButtonText: 'Contact Me',
   contactButtonLink: '#contact',
 };
 
 export const initialAbout: AboutSection = {
-  biography: `I am Daniel Owino, a Senior Software Engineer, Technology Specialist, UI/UX Designer, and Technology Leader with a robust background in full-stack web engineering, cloud infrastructure, computer networking, and graphic design.
+  biography: `I am Daniel Owino, a dedicated Software Engineer and Technology Consultant with a strong foundation in computer science, cloud computing, and full-stack software development. Driven by curiosity and a desire for continuous learning, I specialize in building reliable, high-performance web applications, cloud-native services, and user-focused digital solutions.
 
-My engineering journey is driven by a profound passion for technological innovation and digital transformation. With deep expertise across modern JavaScript/TypeScript ecosystems, backend REST/GraphQL microservices, cloud platforms (GCP, AWS), and network infrastructure, I specialize in engineering high-availability, responsive, and secure software applications.
-
-Beyond writing production-ready code, I am an advocate for clean architecture, user-centered design principles, and collaborative student and community leadership. Whether architecting enterprise databases, optimizing client-side performance, designing high-conversion visual assets, or configuring resilient network environments, my objective is to deliver digital solutions that drive tangible business value and leave a lasting impression.`,
-  personalIntro: 'Senior Software Engineer & Technology Specialist dedicated to engineering scalable digital solutions, elegant interfaces, and resilient infrastructure.',
-  mission: 'To architect clean, scalable, high-performance, and accessible digital products that empower businesses, solve complex challenges, and elevate user experiences.',
-  vision: 'To be a pioneering technology architect and engineering leader driving digital transformation, cloud innovation, and software mastery globally.',
+Over the past years of intensive academic study, hands-on software development, and community leadership, I have acquired expertise in modern web frameworks, database administration, RESTful API design, and cloud architecture. I thrive in collaborative environments where software craftsmanship, clean code principles, and problem-solving drive product excellence.`,
+  personalIntro: 'Motivated tech enthusiast and developer committed to turning visionary concepts into elegant, functional digital applications.',
+  mission: 'To architect clean, scalable, and impactful technology solutions that empower organizations, optimize workflows, and enhance human experiences.',
+  vision: 'To become a distinguished global software leader and technology innovator driving digital transformation across Africa and worldwide.',
   careerInterests: [
-    'Full-Stack Web & Enterprise Application Engineering',
-    'Cloud Systems Architecture, DevOps & Automation',
-    'UI/UX Design & High-Fidelity Design Systems',
-    'Computer Networking, System Administration & IT Security',
-    'Graphic Design, Brand Identity & Digital Media'
+    'Full-Stack Web & Mobile Development',
+    'Cloud Systems Architecture & DevOps',
+    'Enterprise Data Engineering & APIs',
+    'Artificial Intelligence & Applied Machine Learning',
+    'Cybersecurity & Network Infrastructure'
   ],
   specializations: [
-    'Full-Stack Development (React, Next.js, TypeScript, Node.js, Express)',
-    'Cloud Platforms & DevOps (Google Cloud, Firebase, Docker, CI/CD)',
-    'Database Engineering (Firestore, PostgreSQL, Drizzle ORM, MongoDB)',
-    'UI/UX & Graphics (Figma, Responsive Design Systems, Canva, Photoshop)',
-    'Computer Networks & IT Support (Routing, Switching, Hardware Diagnostics)'
+    'Frontend Engineering (React, TypeScript, Tailwind CSS)',
+    'Backend Development (Node.js, Express, REST APIs)',
+    'Database Architecture (PostgreSQL, Firestore, MongoDB)',
+    'Cloud Infrastructure (Google Cloud Platform, AWS, Docker)',
+    'System Design & Security Best Practices'
   ],
   values: [
-    'Engineering Excellence & Clean Architecture',
-    'Uncompromising Code Quality & Performance',
-    'User-Centric Design & Digital Accessibility',
-    'Continuous Innovation & Skill Mastery',
-    'Collaborative Leadership & Knowledge Sharing'
+    'Technical Excellence & Code Craftsmanship',
+    'Integrity & Professional Reliability',
+    'Continuous Learning & Adaptability',
+    'Collaborative Leadership & Mentorship',
+    'User-Centered Problem Solving'
   ],
   shortTermGoals: [
-    'Expand enterprise software consulting and cloud infrastructure deployments',
-    'Attain advanced Senior Cloud Architect & Security certifications',
-    'Mentor emerging developers in full-stack software development and UI/UX design'
+    'Attain advanced Cloud Architect and Full-Stack Certifications',
+    'Deploy high-impact open-source and enterprise software systems',
+    'Expand mentorship initiatives for emerging software developer communities'
   ],
   longTermGoals: [
-    'Establish a premier software engineering consultancy and technological innovation hub',
-    'Lead enterprise-grade digital infrastructure initiatives across global markets',
-    'Pioneer open-source developer tools and scalable cloud-native frameworks'
+    'Found a cutting-edge technology enterprise focused on scalable cloud solutions',
+    'Lead high-performing global engineering teams in developing transformative tech',
+    'Contribute to open-source computing standards and digital infrastructure growth'
   ],
   profileImageUrl: '',
 };
@@ -99,7 +96,7 @@ export const initialEducation: EducationItem[] = [
     endDate: '2026-06',
     currentStatus: true,
     description: 'Specializing in Advanced Software Architecture, Database Systems, Cloud Infrastructure, and Network Security. Maintaining consistent academic excellence and active student tech leadership.',
-    institutionLogo: '',
+    institutionLogo: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=200&q=80',
     relevantSubjects: [
       'Data Structures & Algorithms',
       'Object-Oriented Programming',
@@ -125,7 +122,7 @@ export const initialEducation: EducationItem[] = [
     endDate: '2022-05',
     currentStatus: false,
     description: 'Comprehensive study of hardware diagnostics, Cisco routing & switching, Linux systems administration, and foundational software development.',
-    institutionLogo: '',
+    institutionLogo: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=200&q=80',
     relevantSubjects: [
       'Linux System Administration',
       'Cisco CCNA Networking Essentials',
@@ -177,8 +174,11 @@ export const initialProjects: ProjectItem[] = [
     detailedDescription: 'Built to streamline operations for medium-to-large organizations, this system centralizes hardware inventory, software license tracking, automated maintenance alerts, and audit report generation into a responsive dashboard.',
     category: 'Web Development',
     technologies: ['React', 'TypeScript', 'Node.js', 'Express', 'PostgreSQL', 'Tailwind CSS', 'Docker'],
-    thumbnailUrl: '',
-    galleryImages: [],
+    thumbnailUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    galleryImages: [
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80'
+    ],
     problemStatement: 'Organizations struggled with fragmented asset records across spreadsheets, leading to lost hardware, unmonitored license expirations, and costly compliance failures.',
     solution: 'Designed a unified SaaS dashboard with role-based access control (RBAC), automated barcode scan tracking, and cloud database synchronization.',
     keyFeatures: [
@@ -205,8 +205,11 @@ export const initialProjects: ProjectItem[] = [
     detailedDescription: 'Leveraging IoT sensors and modern cloud telemetry APIs, this platform provides smallholder and commercial farmers with actionable weather insights, automated irrigation scheduling, and crop yield forecasting.',
     category: 'IoT & Cloud',
     technologies: ['React', 'TypeScript', 'Python', 'Firebase Firestore', 'Google Cloud Functions', 'Recharts'],
-    thumbnailUrl: '',
-    galleryImages: [],
+    thumbnailUrl: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=800&q=80',
+    galleryImages: [
+      'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80'
+    ],
     problemStatement: 'Farmers faced uncertain crop yields due to unpredictable climate patterns and inefficient water usage during dry seasons.',
     solution: 'Integrated wireless soil sensors with a cloud-backed dashboard that automatically triggers smart water pumps based on threshold logic.',
     keyFeatures: [
@@ -233,8 +236,10 @@ export const initialProjects: ProjectItem[] = [
     detailedDescription: 'Developed to replace outdated legacy campus portals, delivering a lightning-fast Mobile-first interface with push notifications, course registration, peer-to-peer discussion boards, and event scheduling.',
     category: 'Mobile & Web',
     technologies: ['React', 'TypeScript', 'Express', 'Node.js', 'MongoDB', 'Tailwind CSS'],
-    thumbnailUrl: '',
-    galleryImages: [],
+    thumbnailUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80',
+    galleryImages: [
+      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80'
+    ],
     problemStatement: 'Students experienced frustration with slow, non-responsive portals during course registration peaks.',
     solution: 'Architected a lightweight responsive web app with intelligent caching and seamless document downloads.',
     keyFeatures: [
@@ -278,7 +283,7 @@ export const initialExperience: ExperienceItem[] = [
       'Received Company Performance Award for Technical Quality & Innovation.'
     ],
     skillsUsed: ['React', 'TypeScript', 'Node.js', 'Express', 'PostgreSQL', 'GCP', 'Tailwind CSS'],
-    organizationLogo: '',
+    organizationLogo: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?auto=format&fit=crop&w=200&q=80',
     order: 1,
     published: true,
   },
@@ -302,7 +307,7 @@ export const initialExperience: ExperienceItem[] = [
       'Authored technical documentation used across company engineering teams.'
     ],
     skillsUsed: ['JavaScript', 'React', 'Docker', 'Git', 'REST APIs', 'Unit Testing'],
-    organizationLogo: '',
+    organizationLogo: 'https://images.unsplash.com/photo-1542744094-3a317272018a?auto=format&fit=crop&w=200&q=80',
     order: 2,
     published: true,
   }
@@ -317,7 +322,7 @@ export const initialCertificates: CertificateItem[] = [
     issueDate: '2024-03-15',
     credentialId: 'GCP-ACE-982341',
     credentialUrl: 'https://www.credly.com',
-    certificateFileUrl: '',
+    certificateFileUrl: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=800&q=80',
     verificationUrl: 'https://cloud.google.com/certification',
     category: 'Cloud Computing',
     featured: true,
@@ -332,7 +337,7 @@ export const initialCertificates: CertificateItem[] = [
     issueDate: '2023-09-10',
     credentialId: 'META-FE-772109',
     credentialUrl: 'https://www.coursera.org',
-    certificateFileUrl: '',
+    certificateFileUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80',
     category: 'Web Development',
     featured: true,
     published: true,
@@ -345,7 +350,7 @@ export const initialCertificates: CertificateItem[] = [
     description: 'Validation of core knowledge in networking fundamentals, IP connectivity, IP services, security fundamentals, and network automation.',
     issueDate: '2022-11-20',
     credentialId: 'CISCO-CCNA-441092',
-    certificateFileUrl: '',
+    certificateFileUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
     category: 'Networking & Security',
     featured: false,
     published: true,
@@ -360,7 +365,7 @@ export const initialAchievements: AchievementItem[] = [
     description: 'Awarded first position out of 45 competing university engineering teams for developing an AI-driven smart agriculture irrigation platform.',
     date: '2024-04-18',
     organization: 'National Innovation Hub',
-    imageUrl: '',
+    imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
     category: 'Hackathon & Innovation',
     featured: true,
     published: true,
@@ -372,7 +377,7 @@ export const initialAchievements: AchievementItem[] = [
     description: 'Recognized for top academic standings in Software Architecture and Computer Systems Networking.',
     date: '2023-11-05',
     organization: 'School of Computing & Technology',
-    imageUrl: '',
+    imageUrl: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=800&q=80',
     category: 'Academic Honor',
     featured: true,
     published: true,
@@ -397,7 +402,7 @@ export const initialLeadership: LeadershipItem[] = [
     ],
     startDate: '2023-09',
     endDate: 'Present',
-    imageUrl: '',
+    imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
     order: 1,
     published: true,
   },
@@ -415,7 +420,7 @@ export const initialLeadership: LeadershipItem[] = [
     ],
     startDate: '2022-06',
     endDate: '2023-08',
-    imageUrl: '',
+    imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
     order: 2,
     published: true,
   }
@@ -442,7 +447,7 @@ export const initialBlogPosts: BlogPost[] = [
     id: 'blog-1',
     title: 'Architecting Scalable Cloud-Native Applications in 2026',
     slug: 'architecting-scalable-cloud-native-applications-2026',
-    featuredImageUrl: '',
+    featuredImageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
     excerpt: 'An in-depth guide on designing resilient microservices, optimizing serverless backends, and enforcing modern zero-trust security patterns.',
     content: `
 # Architecting Scalable Cloud-Native Applications in 2026
@@ -484,7 +489,7 @@ In distributed systems, logging is no longer sufficient. Full telemetry requires
     id: 'blog-2',
     title: 'Mastering State Management & Performant React Interfaces',
     slug: 'mastering-state-management-performant-react-interfaces',
-    featuredImageUrl: '',
+    featuredImageUrl: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80',
     excerpt: 'Best practices for organizing state in large React TypeScript projects to avoid unnecessary re-renders and maintain clean component trees.',
     content: `
 # Mastering State Management & Performant React Interfaces
@@ -523,14 +528,14 @@ export const initialFreelanceServices: FreelanceServicesSection = {
   introHeadline: "Pioneering Digital Innovation in the Heart of Kenya",
   introBody: "I transform complex technological landscapes into elegant digital solutions, bridging modern software engineering with intuitive, user-centered design. My work spans web development, DevOps, cybersecurity, and graphic design.",
   services: [
-    { id: 'srv-1', iconName: 'Image', label: 'Designing Birthday Banners', order: 1, imageUrl: '' },
-    { id: 'srv-2', iconName: 'Sparkles', label: 'Designing Birthday Cards', order: 2, imageUrl: '' },
-    { id: 'srv-3', iconName: 'Church', label: 'Church Flyers', order: 3, imageUrl: '' },
-    { id: 'srv-4', iconName: 'Share2', label: 'Social Media Flyers', order: 4, imageUrl: '' },
-    { id: 'srv-5', iconName: 'Building2', label: 'Business Flyers', order: 5, imageUrl: '' },
-    { id: 'srv-6', iconName: 'Code', label: 'Web Design & Development', order: 6, imageUrl: '' },
-    { id: 'srv-7', iconName: 'Terminal', label: 'DevOps Services', order: 7, imageUrl: '' },
-    { id: 'srv-8', iconName: 'ShieldAlert', label: 'Cybersecurity Analysis', order: 8, imageUrl: '' },
+    { id: 'srv-1', iconName: 'Image', label: 'Designing Birthday Banners', order: 1, imageUrl: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80' },
+    { id: 'srv-2', iconName: 'Sparkles', label: 'Designing Birthday Cards', order: 2, imageUrl: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=80' },
+    { id: 'srv-3', iconName: 'Church', label: 'Church Flyers', order: 3, imageUrl: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=800&q=80' },
+    { id: 'srv-4', iconName: 'Share2', label: 'Social Media Flyers', order: 4, imageUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80' },
+    { id: 'srv-5', iconName: 'Building2', label: 'Business Flyers', order: 5, imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80' },
+    { id: 'srv-6', iconName: 'Code', label: 'Web Design & Development', order: 6, imageUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80' },
+    { id: 'srv-7', iconName: 'Terminal', label: 'DevOps Services', order: 7, imageUrl: 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=800&q=80' },
+    { id: 'srv-8', iconName: 'ShieldAlert', label: 'Cybersecurity Analysis', order: 8, imageUrl: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80' },
   ],
   stats: [
     { id: 'stat-1', number: '78', label: 'Completed Code', order: 1 },
@@ -624,39 +629,3 @@ export const initialFreelanceServices: FreelanceServicesSection = {
   location: "Kisumu, Kenya",
   whatsappLink: "https://wa.me/254708083643",
 };
-
-export const initialTestimonials: TestimonialItem[] = [
-  {
-    id: 'test-1',
-    quote: "Daniel did an amazing job on both my design and website — I honestly didn't expect it to turn out this good. Everything looks clean, modern, and very professional, and he really paid attention to the small details that make a big difference. He was easy to work with, understood exactly what I wanted, and delivered beyond my expectations.",
-    name: "Pauline Ruth",
-    role: "Maseno University Student",
-    company: "Maseno University",
-    rating: 5,
-    avatarUrl: '',
-    published: true,
-    order: 1,
-  },
-  {
-    id: 'test-2',
-    quote: "Daniel did an excellent job on my design — the final result was clean, modern, and very professional. He really understood my vision and brought it to life with great attention to detail. The whole process was smooth, and the quality of his work truly stands out.",
-    name: "Mary Kodonyo",
-    role: "Digital Specialist",
-    company: "Digital Marketing Narok",
-    rating: 5,
-    avatarUrl: '',
-    published: true,
-    order: 2,
-  },
-  {
-    id: 'test-3',
-    quote: "Working with Daniel Owino on our enterprise cloud asset management solution was a game-changer. His full-stack engineering skills, architectural clarity, and dedication to code quality ensured our system launched on time and scaled effortlessly.",
-    name: "Dr. James Ochieng",
-    role: "Department Lead & Technology Mentor",
-    company: "School of Computing",
-    rating: 5,
-    avatarUrl: '',
-    published: true,
-    order: 3,
-  }
-];

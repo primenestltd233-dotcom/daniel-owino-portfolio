@@ -65,13 +65,13 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
 
             <div>
-              {/* Professional Title & Roles */}
-              <div className="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-700 text-[11px] font-bold tracking-wider mb-4 leading-relaxed">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                <span>{data.title || 'Software Engineer | Full Stack Web Developer | Technology Specialist | UI/UX Designer | Graphics Designer | Computer Networking & IT Support'}</span>
+              {/* Requirement 3: Editable "SENIOR SOFTWARE ENGINEERING" (data.title) */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[11px] font-bold tracking-widest uppercase mb-4">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                <span>{data.title || 'Senior Software Engineering'}</span>
               </div>
 
-              {/* Prominent Name */}
+              {/* Requirement 6: Animated Wave Text for "DANIEL OWINO" */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] mb-4 tracking-tighter">
                 Hi, I'm{' '}
                 <span className="inline-flex flex-wrap">
@@ -90,42 +90,40 @@ export const Hero: React.FC<HeroProps> = ({
                 </span>
               </h1>
 
-              {/* Professional Statement */}
-              <p className="text-slate-700 text-base sm:text-lg max-w-2xl leading-relaxed mb-5 font-medium">
-                {data.shortIntro || 'I design and build modern, responsive, high-performance digital solutions that help businesses and organizations solve real-world challenges.'}
+              <p className="text-slate-600 text-base sm:text-lg max-w-xl leading-relaxed mb-6 font-normal">
+                {data.shortIntro}
               </p>
 
-              {data.tagline && (
-                <div className="p-4 bg-slate-50 border-l-4 border-indigo-600 rounded-r-2xl text-slate-700 font-medium italic text-xs sm:text-sm mb-6">
-                  "{data.tagline}"
-                </div>
-              )}
+              <div className="p-4 bg-slate-50 border-l-4 border-indigo-600 rounded-r-2xl text-slate-700 font-medium italic text-xs sm:text-sm mb-6">
+                "{data.tagline}"
+              </div>
             </div>
 
             {/* Action CTAs */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
+              {/* Requirement 7: Animated Pulsing "Explore Projects" CTA Button */}
               <button
                 onClick={() => onNavigate(data.primaryButtonLink?.replace('#', '') || 'projects')}
-                className="flex items-center gap-2.5 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs sm:text-sm rounded-full shadow-lg shadow-indigo-600/25 transition-all duration-300 transform hover:-translate-y-0.5 animate-cta-pulse cursor-pointer border border-indigo-500"
+                className="flex items-center gap-2.5 px-6 py-3.5 bg-slate-900 hover:bg-indigo-600 text-white font-extrabold text-xs sm:text-sm rounded-full shadow-xl shadow-slate-900/20 transition-all duration-300 transform hover:-translate-y-0.5 animate-cta-pulse cursor-pointer border border-slate-800"
               >
-                <span>{data.primaryButtonText || 'View Projects'}</span>
-                <ArrowRight className="w-4 h-4 text-indigo-200 group-hover:text-white" />
-              </button>
-
-              <button
-                onClick={() => onNavigate(data.contactButtonLink?.replace('#', '') || 'contact')}
-                className="flex items-center gap-2 px-5 py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-full shadow-md shadow-slate-900/20 transition-all cursor-pointer"
-              >
-                <Mail className="w-4 h-4 text-indigo-400" />
-                <span>{data.contactButtonText || 'Contact Me'}</span>
+                <span>{data.primaryButtonText || 'Explore Projects'}</span>
+                <ArrowRight className="w-4 h-4 text-indigo-400 group-hover:text-white" />
               </button>
 
               <button
                 onClick={() => onNavigate(data.secondaryButtonLink?.replace('#', '') || 'resume')}
-                className="flex items-center gap-2 px-4 py-3 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm rounded-full border border-slate-200 shadow-2xs transition-all hover:border-slate-300"
+                className="flex items-center gap-2 px-5 py-3 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm rounded-full border border-slate-200 shadow-xs transition-all hover:border-slate-300"
               >
                 <Download className="w-4 h-4 text-indigo-600" />
                 <span>{data.secondaryButtonText || 'Download CV'}</span>
+              </button>
+
+              <button
+                onClick={() => onNavigate(data.contactButtonLink?.replace('#', '') || 'contact')}
+                className="flex items-center gap-2 px-4 py-3 text-slate-600 hover:text-indigo-600 font-semibold text-xs sm:text-sm rounded-full hover:bg-indigo-50/60 transition-colors"
+              >
+                <Mail className="w-4 h-4" />
+                <span>{data.contactButtonText || 'Contact Me'}</span>
               </button>
             </div>
           </div>
