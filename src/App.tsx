@@ -11,6 +11,7 @@ import { Achievements } from './components/public/Achievements';
 import { Leadership } from './components/public/Leadership';
 import { CVResume } from './components/public/CVResume';
 import { BlogView } from './components/public/BlogView';
+import { FreelanceServices } from './components/public/FreelanceServices';
 import { Contact } from './components/public/Contact';
 import { Footer } from './components/Footer';
 import { FloatingButtons } from './components/public/FloatingButtons';
@@ -40,7 +41,8 @@ import {
   subscribeBlog, 
   subscribeMessages, 
   subscribeSocials, 
-  subscribeMedia 
+  subscribeMedia,
+  subscribeFreelanceServices
 } from './lib/portfolioService';
 
 import { 
@@ -58,7 +60,8 @@ import {
   ContactMessage, 
   SocialLink, 
   SiteSettings, 
-  MediaItem 
+  MediaItem,
+  FreelanceServicesSection
 } from './types';
 import { 
   initialHero, 
@@ -73,7 +76,8 @@ import {
   initialCV, 
   initialBlogPosts, 
   initialSocials, 
-  initialSiteSettings 
+  initialSiteSettings,
+  initialFreelanceServices
 } from './lib/seedData';
 
 export default function App() {
@@ -107,6 +111,7 @@ export default function App() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [socials, setSocials] = useState<SocialLink[]>(() => loadCache<SocialLink[]>('socials') || initialSocials);
   const [media, setMedia] = useState<MediaItem[]>([]);
+  const [freelanceServices, setFreelanceServices] = useState<FreelanceServicesSection>(() => loadCache<FreelanceServicesSection>('freelanceServices') || initialFreelanceServices);
 
   // Dynamic Document Title Sync
   useEffect(() => {
@@ -153,6 +158,7 @@ export default function App() {
     const unsubMessages = subscribeMessages(setMessages);
     const unsubSocials = subscribeSocials(setSocials);
     const unsubMedia = subscribeMedia(setMedia);
+    const unsubFreelanceServices = subscribeFreelanceServices(setFreelanceServices);
 
     return () => {
       unsubSettings();
@@ -170,6 +176,7 @@ export default function App() {
       unsubMessages();
       unsubSocials();
       unsubMedia();
+      unsubFreelanceServices();
     };
   }, []);
 
@@ -263,6 +270,9 @@ export default function App() {
         {/* 11. BLOG & ARTICLES */}
         <BlogView items={blog} />
 
+        {/* 11.5 FREELANCE SERVICES — DAN'S DEVOPS */}
+        <FreelanceServices data={freelanceServices} />
+
         {/* 12. CONTACT */}
         <Contact settings={settings} socials={socials} />
       </main>
@@ -307,6 +317,7 @@ export default function App() {
           socials={socials}
           settings={settings}
           media={media}
+          freelanceServices={freelanceServices}
           onCloseAdmin={() => setIsAdminDashboardOpen(false)}
           onLogoutAdmin={handleLogoutAdmin}
         />

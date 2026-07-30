@@ -229,3 +229,56 @@ export interface MediaItem {
   sizeBytes?: number;
   createdAt: string;
 }
+
+export interface ServiceItem {
+  id: string;
+  iconName: string;
+  label: string;
+  order: number;
+}
+
+export interface StatItem {
+  id: string;
+  number: string;
+  label: string;
+  order: number;
+}
+
+export interface PricingTier {
+  id: string;
+  category: 'Graphic Design' | 'Web Development';
+  name: string;
+  price: string;
+  popular?: boolean;
+  features: string[];
+  buttonText: string;
+  buttonLink: string;
+  order: number;
+}
+
+export interface ServiceTestimonial {
+  id: string;
+  quote: string;
+  name: string;
+  role: string;
+  avatarUrl?: string;
+  order: number;
+}
+
+export interface FreelanceServicesSection {
+  id?: string;
+  sectionTitle: string;
+  subtitle: string;
+  introHeadline: string;
+  introBody: string;
+  services: ServiceItem[];
+  stats: StatItem[];
+  pricing: PricingTier[];
+  testimonials: ServiceTestimonial[];
+  contactHeading: string;
+  contactSubtext: string;
+  phone: string;
+  email: string;
+  location: string;
+  whatsappLink?: string;
+}

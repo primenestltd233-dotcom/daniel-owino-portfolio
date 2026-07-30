@@ -25,7 +25,8 @@ import {
   ContactMessage, 
   SocialLink, 
   SiteSettings,
-  MediaItem
+  MediaItem,
+  FreelanceServicesSection
 } from '../types';
 import { 
   initialHero, 
@@ -40,7 +41,8 @@ import {
   initialCV, 
   initialBlogPosts, 
   initialSocials, 
-  initialSiteSettings 
+  initialSiteSettings,
+  initialFreelanceServices
 } from './seedData';
 
 // Helper function to strip `undefined` fields recursively before saving to Firestore
@@ -87,13 +89,18 @@ export function saveCache<T>(key: string, data: T) {
 let isSeeded = false;
 
 export async function ensureInitialSeed() {
-  if (isSeeded) return;
+  if (isSeeded || localStorage.getItem('seed_flag_v3') === 'true') {
+    isSeeded = true;
+    return;
+  }
+  isSeeded = true;
+  localStorage.setItem('seed_flag_v3', 'true');
+
   try {
     // Check if seeding has already been performed in this Firestore database
     const seedFlagRef = doc(db, 'settings', 'seed_flag');
     const seedFlagSnap = await getDoc(seedFlagRef);
     if (seedFlagSnap.exists()) {
-      isSeeded = true;
       return;
     }
 
@@ -197,9 +204,15 @@ export async function ensureInitialSeed() {
       }
     }
 
+    // Check freelanceServices doc
+    const freelanceRef = doc(db, 'freelanceServices', 'main');
+    const freelanceSnap = await getDoc(freelanceRef);
+    if (!freelanceSnap.exists()) {
+      await setDoc(freelanceRef, sanitizeForFirestore(initialFreelanceServices));
+    }
+
     // Mark database as seeded permanently so future reloads won't re-seed
     await setDoc(seedFlagRef, { seeded: true, timestamp: new Date().toISOString() });
-    isSeeded = true;
   } catch (err) {
     console.warn('Firestore seed check notice:', err);
   }
@@ -211,88 +224,145 @@ export async function ensureInitialSeed() {
 export function subscribeSettings(callback: (data: SiteSettings) => void) {
   const ref = doc(db, 'settings', 'config');
   const cached = loadCache<SiteSettings>('settings');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialSiteSettings;
+  callback(initial);
+  saveCache('settings', initial);
 
   return onSnapshot(ref, (snap) => {
     if (snap.exists()) {
       const data = snap.data() as SiteSettings;
       saveCache('settings', data);
       callback(data);
-    } else {
-      callback(initialSiteSettings);
     }
   }, (err) => {
-    console.error('subscribeSettings error:', err);
-    callback(cached || initialSiteSettings);
+    console.warn('subscribeSettings notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<SiteSettings>('settings');
+    callback(fallback !== null ? fallback : initialSiteSettings);
   });
 }
 
 export async function updateSettings(data: Partial<SiteSettings>) {
   const ref = doc(db, 'settings', 'config');
   const cleanData = sanitizeForFirestore(data);
-  await setDoc(ref, cleanData, { merge: true });
-  saveCache('settings', cleanData as SiteSettings);
+  const current = loadCache<SiteSettings>('settings') || initialSiteSettings;
+  const merged = { ...current, ...cleanData };
+  saveCache('settings', merged);
+  try {
+    await setDoc(ref, cleanData, { merge: true });
+  } catch (err: any) {
+    console.warn('updateSettings Firestore write notice:', err?.message);
+  }
 }
 
 // 2. Hero Section
 export function subscribeHero(callback: (data: HeroSection) => void) {
   const ref = doc(db, 'hero', 'main');
   const cached = loadCache<HeroSection>('hero');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialHero;
+  callback(initial);
+  saveCache('hero', initial);
 
   return onSnapshot(ref, (snap) => {
     if (snap.exists()) {
       const data = snap.data() as HeroSection;
       saveCache('hero', data);
       callback(data);
-    } else {
-      callback(initialHero);
     }
   }, (err) => {
-    console.error('subscribeHero error:', err);
-    callback(cached || initialHero);
+    console.warn('subscribeHero notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<HeroSection>('hero');
+    callback(fallback !== null ? fallback : initialHero);
   });
 }
 
 export async function updateHero(data: Partial<HeroSection>) {
   const ref = doc(db, 'hero', 'main');
   const cleanData = sanitizeForFirestore(data);
-  await setDoc(ref, cleanData, { merge: true });
-  saveCache('hero', cleanData as HeroSection);
+  const current = loadCache<HeroSection>('hero') || initialHero;
+  const merged = { ...current, ...cleanData };
+  saveCache('hero', merged);
+  try {
+    await setDoc(ref, cleanData, { merge: true });
+  } catch (err: any) {
+    console.warn('updateHero Firestore write notice:', err?.message);
+  }
 }
 
 // 3. About Section
 export function subscribeAbout(callback: (data: AboutSection) => void) {
   const ref = doc(db, 'about', 'main');
   const cached = loadCache<AboutSection>('about');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialAbout;
+  callback(initial);
+  saveCache('about', initial);
 
   return onSnapshot(ref, (snap) => {
     if (snap.exists()) {
       const data = snap.data() as AboutSection;
       saveCache('about', data);
       callback(data);
-    } else {
-      callback(initialAbout);
     }
   }, (err) => {
-    console.error('subscribeAbout error:', err);
-    callback(cached || initialAbout);
+    console.warn('subscribeAbout notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<AboutSection>('about');
+    callback(fallback !== null ? fallback : initialAbout);
   });
 }
 
 export async function updateAbout(data: Partial<AboutSection>) {
   const ref = doc(db, 'about', 'main');
   const cleanData = sanitizeForFirestore(data);
-  await setDoc(ref, cleanData, { merge: true });
-  saveCache('about', cleanData as AboutSection);
+  const current = loadCache<AboutSection>('about') || initialAbout;
+  const merged = { ...current, ...cleanData };
+  saveCache('about', merged);
+  try {
+    await setDoc(ref, cleanData, { merge: true });
+  } catch (err: any) {
+    console.warn('updateAbout Firestore write notice:', err?.message);
+  }
+}
+
+// 3.5 Freelance Services Section
+export function subscribeFreelanceServices(callback: (data: FreelanceServicesSection) => void) {
+  const ref = doc(db, 'freelanceServices', 'main');
+  const cached = loadCache<FreelanceServicesSection>('freelanceServices');
+  const initial = cached !== null ? cached : initialFreelanceServices;
+  callback(initial);
+  saveCache('freelanceServices', initial);
+
+  return onSnapshot(ref, (snap) => {
+    if (snap.exists()) {
+      const data = snap.data() as FreelanceServicesSection;
+      saveCache('freelanceServices', data);
+      callback(data);
+    }
+  }, (err) => {
+    console.warn('subscribeFreelanceServices notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<FreelanceServicesSection>('freelanceServices');
+    callback(fallback !== null ? fallback : initialFreelanceServices);
+  });
+}
+
+export async function updateFreelanceServices(data: Partial<FreelanceServicesSection>) {
+  const ref = doc(db, 'freelanceServices', 'main');
+  const cleanData = sanitizeForFirestore(data);
+  const current = loadCache<FreelanceServicesSection>('freelanceServices') || initialFreelanceServices;
+  const merged = { ...current, ...cleanData };
+  saveCache('freelanceServices', merged);
+  try {
+    await setDoc(ref, cleanData, { merge: true });
+  } catch (err: any) {
+    console.warn('updateFreelanceServices Firestore write notice:', err?.message);
+  }
 }
 
 // 4. Education
 export function subscribeEducation(callback: (items: EducationItem[]) => void) {
   const colRef = collection(db, 'education');
   const cached = loadCache<EducationItem[]>('education');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialEducation;
+  callback(initial);
+  saveCache('education', initial);
 
   return onSnapshot(colRef, (snap) => {
     const items: EducationItem[] = [];
@@ -303,26 +373,45 @@ export function subscribeEducation(callback: (items: EducationItem[]) => void) {
     saveCache('education', items);
     callback(items);
   }, (err) => {
-    console.error('subscribeEducation error:', err);
-    callback(cached || initialEducation);
+    console.warn('subscribeEducation notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<EducationItem[]>('education');
+    callback(fallback !== null ? fallback : initialEducation);
   });
 }
 
 export async function saveEducationItem(item: EducationItem) {
   const id = item.id || `edu_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'education', id), cleanItem, { merge: true });
+  const cached = loadCache<EducationItem[]>('education') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('education', updated);
+  try {
+    await setDoc(doc(db, 'education', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveEducationItem Firestore write notice:', err?.message);
+  }
 }
 
 export async function deleteEducationItem(id: string) {
-  await deleteDoc(doc(db, 'education', id));
+  const cached = loadCache<EducationItem[]>('education') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('education', updated);
+  try {
+    await deleteDoc(doc(db, 'education', id));
+  } catch (err: any) {
+    console.warn('deleteEducationItem Firestore delete notice:', err?.message);
+  }
 }
 
 // 5. Skills
 export function subscribeSkills(callback: (items: SkillItem[]) => void) {
   const colRef = collection(db, 'skills');
   const cached = loadCache<SkillItem[]>('skills');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialSkills;
+  callback(initial);
+  saveCache('skills', initial);
 
   return onSnapshot(colRef, (snap) => {
     const items: SkillItem[] = [];
@@ -333,26 +422,45 @@ export function subscribeSkills(callback: (items: SkillItem[]) => void) {
     saveCache('skills', items);
     callback(items);
   }, (err) => {
-    console.error('subscribeSkills error:', err);
-    callback(cached || initialSkills);
+    console.warn('subscribeSkills notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<SkillItem[]>('skills');
+    callback(fallback !== null ? fallback : initialSkills);
   });
 }
 
 export async function saveSkillItem(item: SkillItem) {
   const id = item.id || `sk_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'skills', id), cleanItem, { merge: true });
+  const cached = loadCache<SkillItem[]>('skills') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('skills', updated);
+  try {
+    await setDoc(doc(db, 'skills', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveSkillItem Firestore write notice:', err?.message);
+  }
 }
 
 export async function deleteSkillItem(id: string) {
-  await deleteDoc(doc(db, 'skills', id));
+  const cached = loadCache<SkillItem[]>('skills') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('skills', updated);
+  try {
+    await deleteDoc(doc(db, 'skills', id));
+  } catch (err: any) {
+    console.warn('deleteSkillItem Firestore delete notice:', err?.message);
+  }
 }
 
 // 6. Projects
 export function subscribeProjects(callback: (items: ProjectItem[]) => void) {
   const colRef = collection(db, 'projects');
   const cached = loadCache<ProjectItem[]>('projects');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialProjects;
+  callback(initial);
+  saveCache('projects', initial);
 
   return onSnapshot(colRef, (snap) => {
     const items: ProjectItem[] = [];
@@ -363,26 +471,45 @@ export function subscribeProjects(callback: (items: ProjectItem[]) => void) {
     saveCache('projects', items);
     callback(items);
   }, (err) => {
-    console.error('subscribeProjects error:', err);
-    callback(cached || initialProjects);
+    console.warn('subscribeProjects notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<ProjectItem[]>('projects');
+    callback(fallback !== null ? fallback : initialProjects);
   });
 }
 
 export async function saveProjectItem(item: ProjectItem) {
   const id = item.id || `proj_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'projects', id), cleanItem, { merge: true });
+  const cached = loadCache<ProjectItem[]>('projects') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('projects', updated);
+  try {
+    await setDoc(doc(db, 'projects', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveProjectItem Firestore write notice:', err?.message);
+  }
 }
 
 export async function deleteProjectItem(id: string) {
-  await deleteDoc(doc(db, 'projects', id));
+  const cached = loadCache<ProjectItem[]>('projects') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('projects', updated);
+  try {
+    await deleteDoc(doc(db, 'projects', id));
+  } catch (err: any) {
+    console.warn('deleteProjectItem Firestore delete notice:', err?.message);
+  }
 }
 
 // 7. Work Experience
 export function subscribeExperience(callback: (items: ExperienceItem[]) => void) {
   const colRef = collection(db, 'experience');
   const cached = loadCache<ExperienceItem[]>('experience');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialExperience;
+  callback(initial);
+  saveCache('experience', initial);
 
   return onSnapshot(colRef, (snap) => {
     const items: ExperienceItem[] = [];
@@ -393,26 +520,45 @@ export function subscribeExperience(callback: (items: ExperienceItem[]) => void)
     saveCache('experience', items);
     callback(items);
   }, (err) => {
-    console.error('subscribeExperience error:', err);
-    callback(cached || initialExperience);
+    console.warn('subscribeExperience notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<ExperienceItem[]>('experience');
+    callback(fallback !== null ? fallback : initialExperience);
   });
 }
 
 export async function saveExperienceItem(item: ExperienceItem) {
   const id = item.id || `exp_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'experience', id), cleanItem, { merge: true });
+  const cached = loadCache<ExperienceItem[]>('experience') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('experience', updated);
+  try {
+    await setDoc(doc(db, 'experience', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveExperienceItem Firestore write notice:', err?.message);
+  }
 }
 
 export async function deleteExperienceItem(id: string) {
-  await deleteDoc(doc(db, 'experience', id));
+  const cached = loadCache<ExperienceItem[]>('experience') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('experience', updated);
+  try {
+    await deleteDoc(doc(db, 'experience', id));
+  } catch (err: any) {
+    console.warn('deleteExperienceItem Firestore delete notice:', err?.message);
+  }
 }
 
 // 8. Certificates
 export function subscribeCertificates(callback: (items: CertificateItem[]) => void) {
   const colRef = collection(db, 'certificates');
   const cached = loadCache<CertificateItem[]>('certificates');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialCertificates;
+  callback(initial);
+  saveCache('certificates', initial);
 
   return onSnapshot(colRef, (snap) => {
     const items: CertificateItem[] = [];
@@ -423,26 +569,45 @@ export function subscribeCertificates(callback: (items: CertificateItem[]) => vo
     saveCache('certificates', items);
     callback(items);
   }, (err) => {
-    console.error('subscribeCertificates error:', err);
-    callback(cached || initialCertificates);
+    console.warn('subscribeCertificates notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<CertificateItem[]>('certificates');
+    callback(fallback !== null ? fallback : initialCertificates);
   });
 }
 
 export async function saveCertificateItem(item: CertificateItem) {
   const id = item.id || `cert_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'certificates', id), cleanItem, { merge: true });
+  const cached = loadCache<CertificateItem[]>('certificates') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('certificates', updated);
+  try {
+    await setDoc(doc(db, 'certificates', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveCertificateItem Firestore write notice:', err?.message);
+  }
 }
 
 export async function deleteCertificateItem(id: string) {
-  await deleteDoc(doc(db, 'certificates', id));
+  const cached = loadCache<CertificateItem[]>('certificates') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('certificates', updated);
+  try {
+    await deleteDoc(doc(db, 'certificates', id));
+  } catch (err: any) {
+    console.warn('deleteCertificateItem Firestore delete notice:', err?.message);
+  }
 }
 
 // 9. Achievements
 export function subscribeAchievements(callback: (items: AchievementItem[]) => void) {
   const colRef = collection(db, 'achievements');
   const cached = loadCache<AchievementItem[]>('achievements');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialAchievements;
+  callback(initial);
+  saveCache('achievements', initial);
 
   return onSnapshot(colRef, (snap) => {
     const items: AchievementItem[] = [];
@@ -453,26 +618,45 @@ export function subscribeAchievements(callback: (items: AchievementItem[]) => vo
     saveCache('achievements', items);
     callback(items);
   }, (err) => {
-    console.error('subscribeAchievements error:', err);
-    callback(cached || initialAchievements);
+    console.warn('subscribeAchievements notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<AchievementItem[]>('achievements');
+    callback(fallback !== null ? fallback : initialAchievements);
   });
 }
 
 export async function saveAchievementItem(item: AchievementItem) {
   const id = item.id || `ach_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'achievements', id), cleanItem, { merge: true });
+  const cached = loadCache<AchievementItem[]>('achievements') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('achievements', updated);
+  try {
+    await setDoc(doc(db, 'achievements', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveAchievementItem Firestore write notice:', err?.message);
+  }
 }
 
 export async function deleteAchievementItem(id: string) {
-  await deleteDoc(doc(db, 'achievements', id));
+  const cached = loadCache<AchievementItem[]>('achievements') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('achievements', updated);
+  try {
+    await deleteDoc(doc(db, 'achievements', id));
+  } catch (err: any) {
+    console.warn('deleteAchievementItem Firestore delete notice:', err?.message);
+  }
 }
 
 // 10. Leadership
 export function subscribeLeadership(callback: (items: LeadershipItem[]) => void) {
   const colRef = collection(db, 'leadership');
   const cached = loadCache<LeadershipItem[]>('leadership');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialLeadership;
+  callback(initial);
+  saveCache('leadership', initial);
 
   return onSnapshot(colRef, (snap) => {
     const items: LeadershipItem[] = [];
@@ -483,53 +667,79 @@ export function subscribeLeadership(callback: (items: LeadershipItem[]) => void)
     saveCache('leadership', items);
     callback(items);
   }, (err) => {
-    console.error('subscribeLeadership error:', err);
-    callback(cached || initialLeadership);
+    console.warn('subscribeLeadership notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<LeadershipItem[]>('leadership');
+    callback(fallback !== null ? fallback : initialLeadership);
   });
 }
 
 export async function saveLeadershipItem(item: LeadershipItem) {
   const id = item.id || `lead_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'leadership', id), cleanItem, { merge: true });
+  const cached = loadCache<LeadershipItem[]>('leadership') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('leadership', updated);
+  try {
+    await setDoc(doc(db, 'leadership', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveLeadershipItem Firestore write notice:', err?.message);
+  }
 }
 
 export async function deleteLeadershipItem(id: string) {
-  await deleteDoc(doc(db, 'leadership', id));
+  const cached = loadCache<LeadershipItem[]>('leadership') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('leadership', updated);
+  try {
+    await deleteDoc(doc(db, 'leadership', id));
+  } catch (err: any) {
+    console.warn('deleteLeadershipItem Firestore delete notice:', err?.message);
+  }
 }
 
 // 11. CV / Resume
 export function subscribeCV(callback: (data: CVItem) => void) {
   const ref = doc(db, 'cv', 'main');
   const cached = loadCache<CVItem>('cv');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialCV;
+  callback(initial);
+  saveCache('cv', initial);
 
   return onSnapshot(ref, (snap) => {
     if (snap.exists()) {
       const data = snap.data() as CVItem;
       saveCache('cv', data);
       callback(data);
-    } else {
-      callback(initialCV);
     }
   }, (err) => {
-    console.error('subscribeCV error:', err);
-    callback(cached || initialCV);
+    console.warn('subscribeCV notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<CVItem>('cv');
+    callback(fallback !== null ? fallback : initialCV);
   });
 }
 
 export async function updateCV(data: Partial<CVItem>) {
   const ref = doc(db, 'cv', 'main');
   const cleanData = sanitizeForFirestore(data);
-  await setDoc(ref, cleanData, { merge: true });
-  saveCache('cv', cleanData as CVItem);
+  const current = loadCache<CVItem>('cv') || initialCV;
+  const merged = { ...current, ...cleanData };
+  saveCache('cv', merged);
+  try {
+    await setDoc(ref, cleanData, { merge: true });
+  } catch (err: any) {
+    console.warn('updateCV Firestore write notice:', err?.message);
+  }
 }
 
 // 12. Blog
 export function subscribeBlog(callback: (items: BlogPost[]) => void) {
   const colRef = collection(db, 'blog');
   const cached = loadCache<BlogPost[]>('blog');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialBlogPosts;
+  callback(initial);
+  saveCache('blog', initial);
 
   return onSnapshot(colRef, (snap) => {
     const items: BlogPost[] = [];
@@ -540,19 +750,36 @@ export function subscribeBlog(callback: (items: BlogPost[]) => void) {
     saveCache('blog', items);
     callback(items);
   }, (err) => {
-    console.error('subscribeBlog error:', err);
-    callback(cached || initialBlogPosts);
+    console.warn('subscribeBlog notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<BlogPost[]>('blog');
+    callback(fallback !== null ? fallback : initialBlogPosts);
   });
 }
 
 export async function saveBlogPost(item: BlogPost) {
   const id = item.id || `blog_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'blog', id), cleanItem, { merge: true });
+  const cached = loadCache<BlogPost[]>('blog') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('blog', updated);
+  try {
+    await setDoc(doc(db, 'blog', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveBlogPost Firestore write notice:', err?.message);
+  }
 }
 
 export async function deleteBlogPost(id: string) {
-  await deleteDoc(doc(db, 'blog', id));
+  const cached = loadCache<BlogPost[]>('blog') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('blog', updated);
+  try {
+    await deleteDoc(doc(db, 'blog', id));
+  } catch (err: any) {
+    console.warn('deleteBlogPost Firestore delete notice:', err?.message);
+  }
 }
 
 // 13. Contact Messages
@@ -566,7 +793,7 @@ export function subscribeMessages(callback: (items: ContactMessage[]) => void) {
     items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
     callback(items);
   }, (err) => {
-    console.warn('Messages subscription:', err);
+    console.warn('Messages subscription notice:', err?.message);
     callback([]);
   });
 }
@@ -579,22 +806,36 @@ export async function sendContactMessage(msg: Omit<ContactMessage, 'id' | 'creat
     read: false,
     archived: false,
   });
-  await addDoc(colRef, newDoc);
+  try {
+    await addDoc(colRef, newDoc);
+  } catch (err: any) {
+    console.warn('sendContactMessage notice:', err?.message);
+  }
 }
 
 export async function updateMessageStatus(id: string, updates: Partial<ContactMessage>) {
-  await updateDoc(doc(db, 'messages', id), sanitizeForFirestore(updates));
+  try {
+    await updateDoc(doc(db, 'messages', id), sanitizeForFirestore(updates));
+  } catch (err: any) {
+    console.warn('updateMessageStatus notice:', err?.message);
+  }
 }
 
 export async function deleteMessage(id: string) {
-  await deleteDoc(doc(db, 'messages', id));
+  try {
+    await deleteDoc(doc(db, 'messages', id));
+  } catch (err: any) {
+    console.warn('deleteMessage notice:', err?.message);
+  }
 }
 
 // 14. Social Links
 export function subscribeSocials(callback: (items: SocialLink[]) => void) {
   const colRef = collection(db, 'socials');
   const cached = loadCache<SocialLink[]>('socials');
-  if (cached) callback(cached);
+  const initial = cached !== null ? cached : initialSocials;
+  callback(initial);
+  saveCache('socials', initial);
 
   return onSnapshot(colRef, (snap) => {
     const items: SocialLink[] = [];
@@ -605,19 +846,36 @@ export function subscribeSocials(callback: (items: SocialLink[]) => void) {
     saveCache('socials', items);
     callback(items);
   }, (err) => {
-    console.error('subscribeSocials error:', err);
-    callback(cached || initialSocials);
+    console.warn('subscribeSocials notice (using offline/cache fallback):', err?.message);
+    const fallback = loadCache<SocialLink[]>('socials');
+    callback(fallback !== null ? fallback : initialSocials);
   });
 }
 
 export async function saveSocialLink(item: SocialLink) {
   const id = item.id || `soc_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'socials', id), cleanItem, { merge: true });
+  const cached = loadCache<SocialLink[]>('socials') || [];
+  const index = cached.findIndex(i => i.id === id);
+  const updated = [...cached];
+  if (index >= 0) updated[index] = cleanItem; else updated.push(cleanItem);
+  saveCache('socials', updated);
+  try {
+    await setDoc(doc(db, 'socials', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveSocialLink Firestore write notice:', err?.message);
+  }
 }
 
 export async function deleteSocialLink(id: string) {
-  await deleteDoc(doc(db, 'socials', id));
+  const cached = loadCache<SocialLink[]>('socials') || [];
+  const updated = cached.filter(i => i.id !== id);
+  saveCache('socials', updated);
+  try {
+    await deleteDoc(doc(db, 'socials', id));
+  } catch (err: any) {
+    console.warn('deleteSocialLink Firestore delete notice:', err?.message);
+  }
 }
 
 // 15. Media Library
@@ -631,7 +889,7 @@ export function subscribeMedia(callback: (items: MediaItem[]) => void) {
     items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
     callback(items);
   }, (err) => {
-    console.error('subscribeMedia error:', err);
+    console.warn('subscribeMedia notice:', err?.message);
     callback([]);
   });
 }
@@ -639,9 +897,17 @@ export function subscribeMedia(callback: (items: MediaItem[]) => void) {
 export async function saveMediaItem(item: MediaItem) {
   const id = item.id || `med_${Date.now()}`;
   const cleanItem = sanitizeForFirestore({ ...item, id });
-  await setDoc(doc(db, 'media', id), cleanItem, { merge: true });
+  try {
+    await setDoc(doc(db, 'media', id), cleanItem, { merge: true });
+  } catch (err: any) {
+    console.warn('saveMediaItem notice:', err?.message);
+  }
 }
 
 export async function deleteMediaItem(id: string) {
-  await deleteDoc(doc(db, 'media', id));
+  try {
+    await deleteDoc(doc(db, 'media', id));
+  } catch (err: any) {
+    console.warn('deleteMediaItem notice:', err?.message);
+  }
 }

@@ -15,7 +15,8 @@ import {
   BookOpen, 
   Mail, 
   Home,
-  LogOut
+  LogOut,
+  Wrench
 } from 'lucide-react';
 import { User as FirebaseUser } from 'firebase/auth';
 
@@ -32,6 +33,7 @@ interface NavbarProps {
 export const NAV_ITEMS = [
   { id: 'home', label: 'HOME', icon: Home },
   { id: 'about', label: 'ABOUT', icon: User },
+  { id: 'freelance-services', label: "DAN'S DEVOPS", icon: Wrench },
   { id: 'education', label: 'EDUCATION', icon: GraduationCap },
   { id: 'skills', label: 'SKILLS', icon: Code },
   { id: 'projects', label: 'PROJECTS', icon: Briefcase },

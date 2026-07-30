@@ -28,7 +28,8 @@ import {
   ExternalLink,
   Sparkles,
   Image as ImageIcon,
-  Loader2
+  Loader2,
+  Wrench
 } from 'lucide-react';
 import { 
   HeroSection, 
@@ -45,7 +46,8 @@ import {
   ContactMessage, 
   SocialLink, 
   SiteSettings, 
-  MediaItem
+  MediaItem,
+  FreelanceServicesSection
 } from '../../types';
 import { 
   updateHero, 
@@ -73,7 +75,8 @@ import {
   deleteSocialLink, 
   updateSettings, 
   saveMediaItem, 
-  deleteMediaItem 
+  deleteMediaItem,
+  updateFreelanceServices
 } from '../../lib/portfolioService';
 
 interface AdminDashboardProps {
@@ -92,6 +95,7 @@ interface AdminDashboardProps {
   socials: SocialLink[];
   settings: SiteSettings;
   media: MediaItem[];
+  freelanceServices: FreelanceServicesSection;
   onCloseAdmin: () => void;
   onLogoutAdmin: () => void;
 }
@@ -112,6 +116,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   socials,
   settings,
   media,
+  freelanceServices,
   onCloseAdmin,
   onLogoutAdmin,
 }) => {
@@ -123,11 +128,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [aboutForm, setAboutForm] = useState<AboutSection>(about);
   const [settingsForm, setSettingsForm] = useState<SiteSettings>(settings);
   const [cvForm, setCvForm] = useState<CVItem>(cv);
+  const [freelanceServicesForm, setFreelanceServicesForm] = useState<FreelanceServicesSection>(freelanceServices);
 
   useEffect(() => { setHeroForm(hero); }, [hero]);
   useEffect(() => { setAboutForm(about); }, [about]);
   useEffect(() => { setSettingsForm(settings); }, [settings]);
   useEffect(() => { setCvForm(cv); }, [cv]);
+  useEffect(() => { setFreelanceServicesForm(freelanceServices); }, [freelanceServices]);
 
   const [editingItem, setEditingItem] = useState<any | null>(null);
   const [editingType, setEditingType] = useState<string | null>(null);
@@ -136,6 +143,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleSaveFreelanceServices = async () => {
+    setSavingSection('freelanceServices');
+    try {
+      await updateFreelanceServices(freelanceServicesForm);
+      showToast("Saved ✓ — Freelance Services & DAN'S DevOps data stored in database!", 'success');
+    } catch (err: any) {
+      console.error('Save Freelance Services Error:', err);
+      showToast(`Save failed — changes were NOT stored. (${err?.message || 'Database error'})`, 'error');
+    } finally {
+      setSavingSection(null);
+    }
   };
 
   const handleSaveHero = async () => {
@@ -371,6 +391,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               }`}
             >
               <User className="w-4 h-4" /> About & Core Values
+            </button>
+
+            <button
+              onClick={() => setActiveTab('freelanceServices')}
+              className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'freelanceServices' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Wrench className="w-4 h-4" /> Freelance (DAN'S DevOps)
             </button>
 
             <button
@@ -882,6 +911,564 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   )}
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* TAB 3.5: FREELANCE SERVICES (DAN'S DEVOPS) */}
+          {activeTab === 'freelanceServices' && (
+            <div className="space-y-8 max-w-4xl bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs">
+              <div className="flex items-center justify-between border-b pb-4">
+                <div>
+                  <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                    <Wrench className="w-5 h-5 text-indigo-600" />
+                    DAN'S DevOps — Freelance Services Management
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-1">Manage all headlines, services grid, stats, pricing tables, testimonials, and contact options.</p>
+                </div>
+
+                <button
+                  onClick={handleSaveFreelanceServices}
+                  disabled={savingSection === 'freelanceServices'}
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-600/20 flex items-center gap-2 transition-all shrink-0"
+                >
+                  {savingSection === 'freelanceServices' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Save All Changes</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* 1. MAIN HEADLINES & INTRO */}
+              <div className="space-y-4 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-indigo-600" />
+                  Section Intro & Headlines
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label className="font-bold text-slate-700">Section Title</label>
+                    <input
+                      type="text"
+                      value={freelanceServicesForm.sectionTitle || ''}
+                      onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, sectionTitle: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-slate-700">Subtitle</label>
+                    <input
+                      type="text"
+                      value={freelanceServicesForm.subtitle || ''}
+                      onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, subtitle: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <label className="font-bold text-slate-700">About Block Headline</label>
+                    <input
+                      type="text"
+                      value={freelanceServicesForm.introHeadline || ''}
+                      onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, introHeadline: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-slate-700">About Block Paragraph</label>
+                    <textarea
+                      rows={3}
+                      value={freelanceServicesForm.introBody || ''}
+                      onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, introBody: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. SERVICES GRID MANAGEMENT */}
+              <div className="space-y-4 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Wrench className="w-4 h-4 text-indigo-600" />
+                    Services Offerings Grid ({freelanceServicesForm.services?.length || 0})
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newSrv = {
+                        id: `srv_${Date.now()}`,
+                        iconName: 'Sparkles',
+                        label: 'New Service',
+                        order: (freelanceServicesForm.services?.length || 0) + 1
+                      };
+                      setFreelanceServicesForm({
+                        ...freelanceServicesForm,
+                        services: [...(freelanceServicesForm.services || []), newSrv]
+                      });
+                    }}
+                    className="px-3 py-1.5 bg-indigo-600 text-white font-bold rounded-xl text-xs flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Service
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {freelanceServicesForm.services?.map((srv, idx) => (
+                    <div key={srv.id} className="p-3 bg-white rounded-xl border border-slate-200 flex items-center gap-2">
+                      <select
+                        value={srv.iconName}
+                        onChange={(e) => {
+                          const updated = [...(freelanceServicesForm.services || [])];
+                          updated[idx].iconName = e.target.value;
+                          setFreelanceServicesForm({ ...freelanceServicesForm, services: updated });
+                        }}
+                        className="p-2 bg-slate-50 border rounded-lg text-xs font-semibold"
+                      >
+                        <option value="Image">Image</option>
+                        <option value="Sparkles">Sparkles</option>
+                        <option value="Church">Church</option>
+                        <option value="Share2">Share2</option>
+                        <option value="Building2">Building2</option>
+                        <option value="Code">Code</option>
+                        <option value="Terminal">Terminal</option>
+                        <option value="ShieldAlert">ShieldAlert</option>
+                      </select>
+                      <input
+                        type="text"
+                        value={srv.label}
+                        onChange={(e) => {
+                          const updated = [...(freelanceServicesForm.services || [])];
+                          updated[idx].label = e.target.value;
+                          setFreelanceServicesForm({ ...freelanceServicesForm, services: updated });
+                        }}
+                        className="flex-1 p-2 bg-slate-50 border rounded-lg text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = freelanceServicesForm.services.filter(s => s.id !== srv.id);
+                          setFreelanceServicesForm({ ...freelanceServicesForm, services: updated });
+                        }}
+                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 3. STATS ROW MANAGEMENT */}
+              <div className="space-y-4 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-indigo-600" />
+                    Stats Counter Row ({freelanceServicesForm.stats?.length || 0})
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newStat = {
+                        id: `stat_${Date.now()}`,
+                        number: '10+',
+                        label: 'New Milestone',
+                        order: (freelanceServicesForm.stats?.length || 0) + 1
+                      };
+                      setFreelanceServicesForm({
+                        ...freelanceServicesForm,
+                        stats: [...(freelanceServicesForm.stats || []), newStat]
+                      });
+                    }}
+                    className="px-3 py-1.5 bg-indigo-600 text-white font-bold rounded-xl text-xs flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Stat
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {freelanceServicesForm.stats?.map((st, idx) => (
+                    <div key={st.id} className="p-3 bg-white rounded-xl border border-slate-200 flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={st.number}
+                        onChange={(e) => {
+                          const updated = [...(freelanceServicesForm.stats || [])];
+                          updated[idx].number = e.target.value;
+                          setFreelanceServicesForm({ ...freelanceServicesForm, stats: updated });
+                        }}
+                        placeholder="e.g. 78"
+                        className="w-20 p-2 bg-slate-50 border rounded-lg font-bold text-indigo-600 text-center"
+                      />
+                      <input
+                        type="text"
+                        value={st.label}
+                        onChange={(e) => {
+                          const updated = [...(freelanceServicesForm.stats || [])];
+                          updated[idx].label = e.target.value;
+                          setFreelanceServicesForm({ ...freelanceServicesForm, stats: updated });
+                        }}
+                        placeholder="Stat label..."
+                        className="flex-1 p-2 bg-slate-50 border rounded-lg text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = freelanceServicesForm.stats.filter(s => s.id !== st.id);
+                          setFreelanceServicesForm({ ...freelanceServicesForm, stats: updated });
+                        }}
+                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4. PRICING TIERS MANAGEMENT */}
+              <div className="space-y-4 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Award className="w-4 h-4 text-indigo-600" />
+                    Pricing Tiers ({freelanceServicesForm.pricing?.length || 0})
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newTier = {
+                        id: `price_${Date.now()}`,
+                        category: 'Graphic Design' as const,
+                        name: 'Custom Package',
+                        price: 'Ksh.500',
+                        features: ['Feature 1', 'Feature 2'],
+                        buttonText: 'Get Started',
+                        buttonLink: 'https://wa.me/254708083643',
+                        order: (freelanceServicesForm.pricing?.length || 0) + 1
+                      };
+                      setFreelanceServicesForm({
+                        ...freelanceServicesForm,
+                        pricing: [...(freelanceServicesForm.pricing || []), newTier]
+                      });
+                    }}
+                    className="px-3 py-1.5 bg-indigo-600 text-white font-bold rounded-xl text-xs flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Tier
+                  </button>
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  {freelanceServicesForm.pricing?.map((pt, idx) => (
+                    <div key={pt.id} className="p-4 bg-white rounded-xl border border-slate-200 space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="font-bold text-slate-700">Category</label>
+                          <select
+                            value={pt.category}
+                            onChange={(e) => {
+                              const updated = [...(freelanceServicesForm.pricing || [])];
+                              updated[idx].category = e.target.value as any;
+                              setFreelanceServicesForm({ ...freelanceServicesForm, pricing: updated });
+                            }}
+                            className="w-full mt-1 p-2 bg-slate-50 border rounded-lg font-semibold"
+                          >
+                            <option value="Graphic Design">Graphic Design</option>
+                            <option value="Web Development">Web Development</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">Tier Name</label>
+                          <input
+                            type="text"
+                            value={pt.name}
+                            onChange={(e) => {
+                              const updated = [...(freelanceServicesForm.pricing || [])];
+                              updated[idx].name = e.target.value;
+                              setFreelanceServicesForm({ ...freelanceServicesForm, pricing: updated });
+                            }}
+                            className="w-full mt-1 p-2 bg-slate-50 border rounded-lg font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">Price Display</label>
+                          <input
+                            type="text"
+                            value={pt.price}
+                            onChange={(e) => {
+                              const updated = [...(freelanceServicesForm.pricing || [])];
+                              updated[idx].price = e.target.value;
+                              setFreelanceServicesForm({ ...freelanceServicesForm, pricing: updated });
+                            }}
+                            className="w-full mt-1 p-2 bg-slate-50 border rounded-lg font-bold text-indigo-600"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="font-bold text-slate-700">Button Text</label>
+                          <input
+                            type="text"
+                            value={pt.buttonText}
+                            onChange={(e) => {
+                              const updated = [...(freelanceServicesForm.pricing || [])];
+                              updated[idx].buttonText = e.target.value;
+                              setFreelanceServicesForm({ ...freelanceServicesForm, pricing: updated });
+                            }}
+                            className="w-full mt-1 p-2 bg-slate-50 border rounded-lg"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">Button WhatsApp / Link</label>
+                          <input
+                            type="text"
+                            value={pt.buttonLink}
+                            onChange={(e) => {
+                              const updated = [...(freelanceServicesForm.pricing || [])];
+                              updated[idx].buttonLink = e.target.value;
+                              setFreelanceServicesForm({ ...freelanceServicesForm, pricing: updated });
+                            }}
+                            className="w-full mt-1 p-2 bg-slate-50 border rounded-lg"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-slate-700">Included Features (Comma-separated)</label>
+                        <textarea
+                          rows={2}
+                          value={toStringVal(pt.features)}
+                          onChange={(e) => {
+                            const updated = [...(freelanceServicesForm.pricing || [])];
+                            updated[idx].features = toArray(e.target.value);
+                            setFreelanceServicesForm({ ...freelanceServicesForm, pricing: updated });
+                          }}
+                          className="w-full mt-1 p-2 bg-slate-50 border rounded-lg"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={pt.popular || false}
+                            onChange={(e) => {
+                              const updated = [...(freelanceServicesForm.pricing || [])];
+                              updated[idx].popular = e.target.checked;
+                              setFreelanceServicesForm({ ...freelanceServicesForm, pricing: updated });
+                            }}
+                            className="w-4 h-4 text-indigo-600 rounded"
+                          />
+                          <span className="font-bold text-slate-700">Highlight as "Most Popular"</span>
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = freelanceServicesForm.pricing.filter(p => p.id !== pt.id);
+                            setFreelanceServicesForm({ ...freelanceServicesForm, pricing: updated });
+                          }}
+                          className="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-bold flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Remove Tier
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 5. TESTIMONIALS MANAGEMENT */}
+              <div className="space-y-4 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Users className="w-4 h-4 text-indigo-600" />
+                    Client Testimonials ({freelanceServicesForm.testimonials?.length || 0})
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newTest = {
+                        id: `test_${Date.now()}`,
+                        quote: "Daniel delivered excellent work with incredible attention to detail.",
+                        name: "Client Name",
+                        role: "Business Owner",
+                        order: (freelanceServicesForm.testimonials?.length || 0) + 1
+                      };
+                      setFreelanceServicesForm({
+                        ...freelanceServicesForm,
+                        testimonials: [...(freelanceServicesForm.testimonials || []), newTest]
+                      });
+                    }}
+                    className="px-3 py-1.5 bg-indigo-600 text-white font-bold rounded-xl text-xs flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Testimonial
+                  </button>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  {freelanceServicesForm.testimonials?.map((t, idx) => (
+                    <div key={t.id} className="p-4 bg-white rounded-xl border border-slate-200 space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="font-bold text-slate-700">Client Name</label>
+                          <input
+                            type="text"
+                            value={t.name}
+                            onChange={(e) => {
+                              const updated = [...(freelanceServicesForm.testimonials || [])];
+                              updated[idx].name = e.target.value;
+                              setFreelanceServicesForm({ ...freelanceServicesForm, testimonials: updated });
+                            }}
+                            className="w-full mt-1 p-2 bg-slate-50 border rounded-lg font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">Role / Organization</label>
+                          <input
+                            type="text"
+                            value={t.role}
+                            onChange={(e) => {
+                              const updated = [...(freelanceServicesForm.testimonials || [])];
+                              updated[idx].role = e.target.value;
+                              setFreelanceServicesForm({ ...freelanceServicesForm, testimonials: updated });
+                            }}
+                            className="w-full mt-1 p-2 bg-slate-50 border rounded-lg"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-slate-700">Quote / Feedback</label>
+                        <textarea
+                          rows={3}
+                          value={t.quote}
+                          onChange={(e) => {
+                            const updated = [...(freelanceServicesForm.testimonials || [])];
+                            updated[idx].quote = e.target.value;
+                            setFreelanceServicesForm({ ...freelanceServicesForm, testimonials: updated });
+                          }}
+                          className="w-full mt-1 p-2 bg-slate-50 border rounded-lg"
+                        />
+                      </div>
+
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = freelanceServicesForm.testimonials.filter(item => item.id !== t.id);
+                            setFreelanceServicesForm({ ...freelanceServicesForm, testimonials: updated });
+                          }}
+                          className="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-bold flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Remove Testimonial
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 6. CONTACT DETAILS */}
+              <div className="space-y-4 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-indigo-600" />
+                  Contact Block & WhatsApp Settings
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label className="font-bold text-slate-700">Contact Heading</label>
+                    <input
+                      type="text"
+                      value={freelanceServicesForm.contactHeading || ''}
+                      onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, contactHeading: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-slate-700">Contact Subtext</label>
+                    <input
+                      type="text"
+                      value={freelanceServicesForm.contactSubtext || ''}
+                      onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, contactSubtext: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                  <div>
+                    <label className="font-bold text-slate-700">Phone Number</label>
+                    <input
+                      type="text"
+                      value={freelanceServicesForm.phone || ''}
+                      onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, phone: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-slate-700">Email Address</label>
+                    <input
+                      type="text"
+                      value={freelanceServicesForm.email || ''}
+                      onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, email: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-slate-700">Location</label>
+                    <input
+                      type="text"
+                      value={freelanceServicesForm.location || ''}
+                      onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, location: e.target.value })}
+                      className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-xs">
+                  <label className="font-bold text-slate-700">Direct WhatsApp Link</label>
+                  <input
+                    type="text"
+                    value={freelanceServicesForm.whatsappLink || ''}
+                    onChange={(e) => setFreelanceServicesForm({ ...freelanceServicesForm, whatsappLink: e.target.value })}
+                    className="w-full mt-1 p-2.5 bg-white border border-slate-200 rounded-xl"
+                    placeholder="https://wa.me/254708083643"
+                  />
+                </div>
+              </div>
+
+              {/* SAVE BUTTON */}
+              <div className="pt-4 border-t flex justify-end">
+                <button
+                  onClick={handleSaveFreelanceServices}
+                  disabled={savingSection === 'freelanceServices'}
+                  className="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-600/20 flex items-center gap-2 transition-all"
+                >
+                  {savingSection === 'freelanceServices' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving Changes to Database...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Save Freelance Services Section</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
             </div>
           )}
 

@@ -15,6 +15,7 @@ service cloud.firestore {
     match /cv/{docId} { allow read, write: if true; }
     match /blog/{docId} { allow read, write: if true; }
     match /socials/{docId} { allow read, write: if true; }
+    match /freelanceServices/{docId} { allow read, write: if true; }
     match /media/{docId} { allow read, write: if true; }
     match /messages/{docId} { allow read, write: if true; }
   }
